@@ -3657,6 +3657,10 @@ static inline int _kc_kstrtol_from_user(const char __user *s, size_t count,
 #ifndef HAVE_DCBNL_IEEE_DELAPP
 #define HAVE_DCBNL_IEEE_DELAPP
 #endif
+#ifdef CONFIG_MACH_APALIS_T30
+#define HAVE_ETHTOOL_GET_TS_INFO
+#define HAVE_ETHTOOL_GRXFHINDIR_SIZE
+#endif
 #endif /* < 3.1.0 */
 
 /*****************************************************************************/
