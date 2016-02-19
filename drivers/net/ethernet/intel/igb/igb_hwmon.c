@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2013 Intel Corporation.
+  Copyright(c) 2007-2015 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -12,14 +12,11 @@
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
   more details.
 
-  You should have received a copy of the GNU General Public License along with
-  this program; if not, write to the Free Software Foundation, Inc.,
-  51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-
   The full GNU General Public License is included in this distribution in
   the file called "COPYING".
 
   Contact Information:
+  Linux NICS <linux.nics@intel.com>
   e1000-devel Mailing List <e1000-devel@lists.sourceforge.net>
   Intel Corporation, 5200 N.E. Elam Young Parkway, Hillsboro, OR 97124-6497
 
@@ -28,7 +25,7 @@
 #include "igb.h"
 #include "e1000_82575.h"
 #include "e1000_hw.h"
-
+#ifdef IGB_HWMON
 #include <linux/module.h>
 #include <linux/types.h>
 #include <linux/sysfs.h>
@@ -38,28 +35,29 @@
 #include <linux/hwmon.h>
 #include <linux/pci.h>
 
-#ifdef CONFIG_IGB_HWMON
+#ifdef HAVE_I2C_SUPPORT
 static struct i2c_board_info i350_sensor_info = {
 	I2C_BOARD_INFO("i350bb", (0Xf8 >> 1)),
 };
+#endif /* HAVE_I2C_SUPPORT */
 
 /* hwmon callback functions */
 static ssize_t igb_hwmon_show_location(struct device *dev,
-				       struct device_attribute *attr,
-				       char *buf)
+					 struct device_attribute *attr,
+					 char *buf)
 {
 	struct hwmon_attr *igb_attr = container_of(attr, struct hwmon_attr,
-						   dev_attr);
+						     dev_attr);
 	return sprintf(buf, "loc%u\n",
 		       igb_attr->sensor->location);
 }
 
 static ssize_t igb_hwmon_show_temp(struct device *dev,
-				   struct device_attribute *attr,
-				   char *buf)
+				     struct device_attribute *attr,
+				     char *buf)
 {
 	struct hwmon_attr *igb_attr = container_of(attr, struct hwmon_attr,
-						   dev_attr);
+						     dev_attr);
 	unsigned int value;
 
 	/* reset the temp field */
@@ -74,11 +72,11 @@ static ssize_t igb_hwmon_show_temp(struct device *dev,
 }
 
 static ssize_t igb_hwmon_show_cautionthresh(struct device *dev,
-					    struct device_attribute *attr,
-					    char *buf)
+				     struct device_attribute *attr,
+				     char *buf)
 {
 	struct hwmon_attr *igb_attr = container_of(attr, struct hwmon_attr,
-						   dev_attr);
+						     dev_attr);
 	unsigned int value = igb_attr->sensor->caution_thresh;
 
 	/* display millidegree */
@@ -88,11 +86,11 @@ static ssize_t igb_hwmon_show_cautionthresh(struct device *dev,
 }
 
 static ssize_t igb_hwmon_show_maxopthresh(struct device *dev,
-					  struct device_attribute *attr,
-					  char *buf)
+				     struct device_attribute *attr,
+				     char *buf)
 {
 	struct hwmon_attr *igb_attr = container_of(attr, struct hwmon_attr,
-						   dev_attr);
+						     dev_attr);
 	unsigned int value = igb_attr->sensor->max_op_thresh;
 
 	/* display millidegree */
@@ -111,8 +109,7 @@ static ssize_t igb_hwmon_show_maxopthresh(struct device *dev,
  * the data structures we need to get the data to display.
  */
 static int igb_add_hwmon_attr(struct igb_adapter *adapter,
-			      unsigned int offset, int type)
-{
+				unsigned int offset, int type) {
 	int rc;
 	unsigned int n_attr;
 	struct hwmon_attr *igb_attr;
@@ -193,7 +190,9 @@ int igb_sysfs_init(struct igb_adapter *adapter)
 	unsigned int i;
 	int n_attrs;
 	int rc = 0;
+#ifdef HAVE_I2C_SUPPORT
 	struct i2c_client *client = NULL;
+#endif /* HAVE_I2C_SUPPORT */
 
 	/* If this method isn't defined we don't support thermals */
 	if (adapter->hw.mac.ops.init_thermal_sensor_thresh == NULL)
@@ -203,7 +202,7 @@ int igb_sysfs_init(struct igb_adapter *adapter)
 	rc = (adapter->hw.mac.ops.init_thermal_sensor_thresh(&adapter->hw));
 		if (rc)
 			goto exit;
-
+#ifdef HAVE_I2C_SUPPORT
 	/* init i2c_client */
 	client = i2c_new_device(&adapter->i2c_adap, &i350_sensor_info);
 	if (client == NULL) {
@@ -212,13 +211,14 @@ int igb_sysfs_init(struct igb_adapter *adapter)
 		goto exit;
 	}
 	adapter->i2c_client = client;
+#endif /* HAVE_I2C_SUPPORT */
 
 	/* Allocation space for max attributes
 	 * max num sensors * values (loc, temp, max, caution)
 	 */
 	n_attrs = E1000_MAX_SENSORS * 4;
 	igb_hwmon->hwmon_list = kcalloc(n_attrs, sizeof(struct hwmon_attr),
-					GFP_KERNEL);
+					  GFP_KERNEL);
 	if (!igb_hwmon->hwmon_list) {
 		rc = -ENOMEM;
 		goto err;
@@ -254,4 +254,4 @@ err:
 exit:
 	return rc;
 }
-#endif
+#endif /* IGB_HWMON */

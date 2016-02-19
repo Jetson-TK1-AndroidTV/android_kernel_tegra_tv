@@ -1,7 +1,7 @@
 /*******************************************************************************
 
-  Intel PRO/1000 Linux driver
-  Copyright(c) 1999 - 2013 Intel Corporation.
+  Intel(R) Gigabit Ethernet Linux driver
+  Copyright(c) 2007-2015 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -11,10 +11,6 @@
   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
   more details.
-
-  You should have received a copy of the GNU General Public License along with
-  this program; if not, write to the Free Software Foundation, Inc.,
-  51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
 
   The full GNU General Public License is included in this distribution in
   the file called "COPYING".
@@ -26,13 +22,22 @@
 
 *******************************************************************************/
 
-#ifndef _E1000E_MANAGE_H_
-#define _E1000E_MANAGE_H_
+#ifndef _E1000_MANAGE_H_
+#define _E1000_MANAGE_H_
 
-bool e1000e_check_mng_mode_generic(struct e1000_hw *hw);
-bool e1000e_enable_tx_pkt_filtering(struct e1000_hw *hw);
-s32 e1000e_mng_write_dhcp_info(struct e1000_hw *hw, u8 *buffer, u16 length);
-bool e1000e_enable_mng_pass_thru(struct e1000_hw *hw);
+bool e1000_check_mng_mode_generic(struct e1000_hw *hw);
+bool e1000_enable_tx_pkt_filtering_generic(struct e1000_hw *hw);
+s32  e1000_mng_enable_host_if_generic(struct e1000_hw *hw);
+s32  e1000_mng_host_if_write_generic(struct e1000_hw *hw, u8 *buffer,
+				     u16 length, u16 offset, u8 *sum);
+s32  e1000_mng_write_cmd_header_generic(struct e1000_hw *hw,
+				     struct e1000_host_mng_command_header *hdr);
+s32  e1000_mng_write_dhcp_info_generic(struct e1000_hw *hw,
+				       u8 *buffer, u16 length);
+bool e1000_enable_mng_pass_thru(struct e1000_hw *hw);
+u8 e1000_calculate_checksum(u8 *buffer, u32 length);
+s32 e1000_host_interface_command(struct e1000_hw *hw, u8 *buffer, u32 length);
+s32 e1000_load_firmware(struct e1000_hw *hw, u8 *buffer, u32 length);
 
 enum e1000_mng_mode {
 	e1000_mng_mode_none = 0,
@@ -46,6 +51,8 @@ enum e1000_mng_mode {
 
 #define E1000_FWSM_MODE_MASK			0xE
 #define E1000_FWSM_MODE_SHIFT			1
+#define E1000_FWSM_FW_VALID			0x00008000
+#define E1000_FWSM_HI_EN_ONLY_MODE		0x4
 
 #define E1000_MNG_IAMT_MODE			0x3
 #define E1000_MNG_DHCP_COOKIE_LENGTH		0x10
@@ -59,10 +66,17 @@ enum e1000_mng_mode {
 #define E1000_VFTA_ENTRY_MASK			0x7F
 #define E1000_VFTA_ENTRY_BIT_SHIFT_MASK		0x1F
 
-#define E1000_HICR_EN			0x01	/* Enable bit - RO */
+#define E1000_HI_MAX_BLOCK_BYTE_LENGTH		1792 /* Num of bytes in range */
+#define E1000_HI_MAX_BLOCK_DWORD_LENGTH		448 /* Num of dwords in range */
+#define E1000_HI_COMMAND_TIMEOUT		500 /* Process HI cmd limit */
+#define E1000_HI_FW_BASE_ADDRESS		0x10000
+#define E1000_HI_FW_MAX_LENGTH			(64 * 1024) /* Num of bytes */
+#define E1000_HI_FW_BLOCK_DWORD_LENGTH		256 /* Num of DWORDs per page */
+#define E1000_HICR_MEMORY_BASE_EN		0x200 /* MB Enable bit - RO */
+#define E1000_HICR_EN			0x01  /* Enable bit - RO */
 /* Driver sets this bit when done to put command in RAM */
 #define E1000_HICR_C			0x02
-#define E1000_HICR_SV			0x04	/* Status Validity */
+#define E1000_HICR_SV			0x04  /* Status Validity */
 #define E1000_HICR_FW_RESET_ENABLE	0x40
 #define E1000_HICR_FW_RESET		0x80
 
