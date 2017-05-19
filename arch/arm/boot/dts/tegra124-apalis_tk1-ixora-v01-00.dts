@@ -21,7 +21,6 @@
 /dts-v1/;
 
 #include "tegra124-soc-shield.dtsi"
-#include "tegra124-platforms/tegra124-apalis-keys.dtsi"
 #include "tegra124-platforms/tegra124-apalis-gpio.dtsi"
 #include "tegra124-platforms/tegra124-apalis-pinmux.dtsi"
 #include "tegra124-platforms/tegra124-apalis-pmic.dtsi"
@@ -199,14 +198,11 @@
 		vddio-pex-ctl-supply = <&as3722_sd4>;
 		nvidia,lane-map = <0x10>;
 		status = "okay";
-
-		/* Apalis PCIe (additional lane Apalis type specific) */
 		pci@1,0 {
 			nvidia,disable-clock-request;
 			status = "okay";
 		};
 
-		/* I210 Gigabit Ethernet Controller (On-module) */
 		pci@2,0 {
 			nvidia,disable-clock-request;
 			status = "okay";
@@ -224,57 +220,16 @@
 		status = "okay";
 	};
 
-	extcon {
-		extcon@0 {
-			status = "disabled";
-		};
-	};
-
-	udc@7d000000 {
-		nvidia,port-otg;
-		nvidia,charging-supported;
-		#extcon-cells = <1>;
-		status = "okay";
-	};
-
-        otg@7d000000 {
-		#extcon-cells = <1>;
-		status = "okay";
-	};
-
-	xusb_pad_ctl: xusb_padctl { /* Put common control config here */
-		nvidia,ss_portmap = <0x21>;
-		nvidia,lane_owner = <6>; /* Use 0xF to disable lane assign */
-		nvidia,lane-map = <0x10>;
-		nvidia,enable-sata-port;
-		status = "okay";
-	};
 
 	xusb@70090000 {
 		/* nvidia,uses_external_pmic;
-		/* nvidia,gpio_controls_muxed_ss_lanes; */
+		nvidia,gpio_controls_muxed_ss_lanes; */
 		nvidia,gpio_ss1_sata = <0>;
+		nvidia,portmap = <0x0703>; /* SSP0, USB2P0, USBP2 */
+		nvidia,ss_portmap = <0x72>; /* SSP0 on USB2P2 */
+		nvidia,lane_owner = <4>; /* USB3P0 USB3P1 */
 		nvidia,ulpicap = <0>; /* No ulpi support. can we remove */
-		/* nvidia,supply_utmi_vbuses = "usb_vbus0", "usb_vbus1", "usb_vbus2";
-		nvidia,supply_s3p3v = "hvdd_usb";
-		nvidia,supply_s1p8v = "avdd_pll_utmip";
-		nvidia,supply_s1p05v = "avddio_usb"; */
-		nvidia,portmap = <0x0e03>;
-		nvidia,common_padctl = <&xusb_pad_ctl>;
 		status = "okay";
-	};
-
-	xudc@700d0000 {
-		nvidia,common_padctl = <&xusb_pad_ctl>;
-		nvidia,portmap = <0x0108>;
-		#extcon-cells = <1>;
-		status = "disabled";
-	};
-
-	xotg {
-		#extcon-cells = <1>;
-		nvidia,common_padctl = <&xusb_pad_ctl>;
-		status = "disabled";
 	};
 
 	backlight {

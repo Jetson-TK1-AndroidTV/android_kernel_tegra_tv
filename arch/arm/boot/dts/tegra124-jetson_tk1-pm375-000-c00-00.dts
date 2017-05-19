@@ -21,11 +21,13 @@
 /dts-v1/;
 
 #include "tegra124-soc-shield.dtsi"
-#include "tegra124-platforms/tegra124-tn8-keys-e1780-1100-a02.dtsi"
+#include "tegra124-platforms/tegra124-jetson_tk1-keys-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-gpio-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-pinmux-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson-power-tree-pm375-0000-c00.dtsi"
 #include "tegra124-platforms/tegra124-laguna-hdmi-pm375-1000-a00.dtsi"
+#include "tegra124-platforms/tegra124-jetson_tk1-io-common.dtsi"
+#include "panel-p-wuxga-10-1.dtsi"
 
 / {
 	model = "NVIDIA Tegra124 PM375";
@@ -50,14 +52,27 @@
 		dc@54200000 {
 			status = "okay";
 			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
-			nvidia,emc-clk-rate = <300000000>;
+			nvidia,emc-clk-rate = <204000000>;
 			nvidia,cmu-enable = <1>;
+			nvidia,low-v-win = <0x2>;
 			nvidia,fb-bpp = <32>; /* bits per pixel */
 			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
 		};
-		hdmi {
-			hdmi-display {
-				nvidia,hdmi-vrr-caps = <1>;
+		/* tegradc.1 */
+		dc@54240000 {
+			status = "okay";
+			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
+			nvidia,emc-clk-rate = <300000000>;
+			nvidia,fb-bpp = <32>; /* bits per pixel */
+			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
+		};
+		dsi {
+			nvidia,dsi-controller-vs = <1>;
+			status = "okay";
+			panel-p-wuxga-10-1 {
+				nvidia,dsi-dpd-pads = <DSIC_DPD_EN DSID_DPD_EN>;
+				nvidia,panel-rst-gpio = <&gpio TEGRA_GPIO(H, 3) 0>; /* PH3 */
+				nvidia,panel-bl-pwm-gpio = <&gpio TEGRA_GPIO(H, 1) 0>; /* PH1 */
 			};
 		};
 	};
@@ -98,6 +113,7 @@
 
         serial@70006200 {
                 compatible = "nvidia,tegra114-hsuart";
+		dma-names = "tx";
                 status = "okay";
         };
 
@@ -118,6 +134,22 @@
 		};
 	};
 
+	bcmdhd_wlan {
+		edp-consumer-name = "primary-wifi";
+	};
+
+	bcmdhd_wlan {
+		fw_path = "/system/vendor/firmware/fw_bcmdhd.bin";
+		nv_path = "/system/etc/nvram_apalis-tk1_4356.txt";
+		country_code_map {
+			CC1 {
+				iso_abbrev = "XR";
+				custom_locale = "XR";
+				custom_locale_rev = <122>;
+			};
+		};
+	};
+
 	memory@0x80000000 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0x0 0x80000000>;
@@ -131,19 +163,6 @@
 	spi@7000da00 {
 		status = "okay";
 		spi-max-frequency = <25000000>;
-	};
-
-	pmc@7000e400 {
-		status = "okay";
-		nvidia,invert-interrupt;
-		nvidia,suspend-mode = <0>;
-		nvidia,cpu-pwr-good-time = <500>;
-		nvidia,cpu-pwr-off-time = <300>;
-		nvidia,core-pwr-good-time = <3845 3845>;
-		nvidia,core-pwr-off-time = <2000>;
-		nvidia,core-power-req-active-high;
-		nvidia,sys-clock-req-active-high;
-		nvidia,lp0-vec = <0xf46ff000 2064>;
 	};
 
 	pcie-controller {
@@ -166,16 +185,6 @@
 		};
 	};
 
-        sata@70020000 {
-                status = "okay";
-                nvidia,enable-sata-port;
-		vdd_sata-supply = <&as3722_sd4>;
-		avdd_sata_pll-supply =<&as3722_sd4>;
-		avdd_sata-supply = <&as3722_sd4>;
-		hvdd_sata-supply = <&as3722_gpio2_supply>;
-		vddio_pex_sata-supply = <&as3722_gpio2_supply>;
-	};
-
 	xusb@70090000 {
 		/* nvidia,uses_external_pmic;
 		nvidia,gpio_controls_muxed_ss_lanes; */
@@ -186,6 +195,17 @@
 		nvidia,ulpicap = <0>; /* No ulpi support. can we remove */
 		status = "okay";
 	};
+
+        sata@70020000 {
+                status = "okay";
+                nvidia,enable-sata-port;
+		vdd_sata-supply = <&as3722_sd4>;
+		avdd_sata_pll-supply =<&as3722_sd4>;
+		avdd_sata-supply = <&as3722_sd4>;
+		hvdd_sata-supply = <&as3722_gpio2_supply>;
+		vddio_pex_sata-supply = <&as3722_gpio2_supply>;
+	};
+
 	backlight {
 		compatible = "pwm-backlight";
 		status = "okay";

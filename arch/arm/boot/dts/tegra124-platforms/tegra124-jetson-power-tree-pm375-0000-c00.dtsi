@@ -25,6 +25,15 @@
 	host1x {
 		/* tegradc.0 */
 		dc@54200000 {
+			avdd_dsi_csi-supply = <&as3722_ldo2>;
+			avdd_lcd-supply = <&as3722_gpio4_supply>;
+			dvdd_lcd-supply = <&reg_1v8_supply>;
+			vdd_lcd_bl-supply = <&vdd_lcd_bl>;
+			vdd_lcd_bl_en-supply = <&vdd_lcd_bl_en>;
+		};
+
+		/* tegradc.1 */
+		dc@54240000 {
 			avdd_hdmi-supply = <&as3722_sd4>;
 			avdd_hdmi_pll-supply = <&avdd_hdmi_pll>;
 			vdd_hdmi_5v0-supply = <&vdd_hdmi>;
@@ -39,6 +48,25 @@
 		vpp_fuse-supply = <&as3722_ldo11>;
 	};
 
+	udc@7d000000 {
+		avdd_usb-supply = <&as3722_gpio2_supply>;
+		avdd_pll_utmip-supply = <&reg_1v8_supply>;
+	};
+
+	sound {
+		ldoen-supply = <&vdd_cdc_1v2_aud>;
+		dbvdd-supply = <&reg_1v8_supply>;
+		avdd-supply = <&reg_1v8_supply>;
+		dmicvdd-supply = <&reg_1v8_supply>;
+		spkvdd-supply = <&reg_5v0_supply>;
+		vdd-aud-dgtl-supply = <&reg_1v8_supply>;
+		avdd-aud-supply = <&reg_1v8_supply>;
+	};
+
+        otg@7d000000 {
+                usb_vbus-supply = <&usb0_vbus>;
+        };
+
 	power-detect {
 		pwrdet-pex-ctl-supply = <&as3722_sd4>;
 		pwrdet-nand-supply = <&as3722_sd5>;
@@ -52,6 +80,7 @@
 		pwrdet-sdmmc3-supply = <&as3722_ldo6>;
 		pwrdet-hv-supply = <&as3722_gpio2_supply>;
 	};
+
 	xusb@70090000 {
 		usb_vbus0-supply = <&usb0_vbus>;
 		usb_vbus1-supply = <&usb1_usb2_vbus>;

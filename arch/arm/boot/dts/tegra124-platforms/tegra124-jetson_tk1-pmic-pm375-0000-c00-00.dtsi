@@ -1,6 +1,6 @@
- #include <dt-bindings/gpio/tegra-gpio.h>
- #include <dt-bindings/mfd/as3722.h>
- #include <dt-bindings/regulator/regulator.h>
+#include <dt-bindings/gpio/tegra-gpio.h>
+#include <dt-bindings/mfd/as3722.h>
+#include <dt-bindings/regulator/regulator.h>
 
 / {
 	i2c@7000d000 {

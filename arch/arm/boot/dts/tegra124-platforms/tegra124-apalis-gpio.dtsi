@@ -53,7 +53,7 @@
 				TEGRA_GPIO(N, 2)
 				TEGRA_GPIO(N, 4)
 				TEGRA_GPIO(N, 5)
-#if 0
+#if 1
 				TEGRA_GPIO(O, 6) /* LAN_DEV_OFF# */
 #endif
 				TEGRA_GPIO(Q, 5) /* Shift_CTRL_Dir_Out[0] */
