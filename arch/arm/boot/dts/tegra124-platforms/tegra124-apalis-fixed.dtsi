@@ -44,16 +44,11 @@
 		};
 
 		reg_3v3: regulator@2 {
-			compatible = "regulator-fixed-sync";
+			compatible = "regulator-fixed";
 			reg = <2>;
-			regulator-name = "+V3.3";
+			regulator-name = "reg-3v3";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			regulator-always-on;
-			regulator-boot-on;
-			/* PWR_EN_+V3.3 */
-			gpio = <&as3722 2 0>;
-			enable-active-high;
 
 			consumers {
 				c1 {
@@ -84,33 +79,44 @@
 					regulator-consumer-supply = "pwrdet_hv";
 				};
 				c8 {
-					regulator-consumer-supply = "vdd_sys_cam_3v3";
+					regulator-consumer-supply = "hvdd_sata";
 				};
 				c9 {
+					regulator-consumer-supply = "hvdd_pex";
+					regulator-consumer-device = "tegra-pcie";
+				};
+				c10 {
+					regulator-consumer-supply = "hvdd_pex_pll";
+					regulator-consumer-device = "tegra-pcie";
+				};
+				c11 {
+					regulator-consumer-supply = "vdd_sys_cam_3v3";
+				};
+				c12 {
 					regulator-consumer-supply = "VDDA";
 					regulator-consumer-device = "4-000a";
 				};
-				c10 {
+				c13 {
 					regulator-consumer-supply = "vddio_sd_slot";
 					regulator-consumer-device = "sdhci-tegra.0";
 				};
-				c11 {
+				c14 {
 					regulator-consumer-supply = "vddio_sd_slot";
 					regulator-consumer-device = "sdhci-tegra.2";
 				};
-				c12 {
+				c15 {
 					regulator-consumer-supply = "vdd_3v3_sensor";
 				};
-				c13 {
+				c16 {
 					regulator-consumer-supply = "vdd_kp_3v3";
 				};
-				c14 {
+				c17 {
 					regulator-consumer-supply = "vdd_tp_3v3";
 				};
-				c15 {
+				c18 {
 					regulator-consumer-supply = "vdd_dtv_3v3";
 				};
-				c16 {
+				c19 {
 					regulator-consumer-supply = "vdd";
 					regulator-consumer-device = "4-004c";
 				};
@@ -194,27 +200,7 @@
 			};
 		};
 
-		reg_3v3_supply: regulator@6 {
-			compatible = "regulator-fixed";
-			reg = <6>;
-			regulator-name = "reg-3v3-supply";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-
-			consumers {
-				c1 {
-					regulator-consumer-supply = "hvdd_pex";
-				};
-				c2 {
-					regulator-consumer-supply = "hvdd_pex_pll";
-				};
-				c3 {
-					regulator-consumer-supply = "hvdd_sata";
-				};
-			};
-		};
-
-		vdd_lcd_bl_en: regulator@7 {
+		vdd_lcd_bl_en: regulator@6 {
 			compatible = "regulator-fixed-sync";
 			reg = <7>;
 			regulator-name = "BKL1_ON";

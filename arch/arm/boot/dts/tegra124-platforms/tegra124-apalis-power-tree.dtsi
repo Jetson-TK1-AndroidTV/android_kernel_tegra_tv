@@ -58,6 +58,7 @@
 		usb_vbus1-supply = <&usb1_usb2_vbus>;
 		usb_vbus2-supply = <&usb1_usb2_vbus>;
 		hvdd_usb-supply = <&reg_3v3>;
+		avdd_pll_erefe-supply = <&as3722_ldo0>;
 		avdd_pll_utmip-supply = <&as3722_sd5>;
 		vddio_hsic-supply = <&as3722_ldo2>;
 		avddio_usb-supply = <&as3722_sd4>;
