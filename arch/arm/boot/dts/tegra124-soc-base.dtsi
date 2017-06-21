@@ -1018,12 +1018,6 @@
 		status = "disabled";
 	};
 
-	psci {
-		compatible = "arm,psci-0.2";
-		method = "smc";
-		status = "disabled";
-	};
-
 	sdhci@700b0600 {
 		compatible = "nvidia,tegra124-sdhci";
 		power-domains = <&mc_clk_pd>;
