@@ -1261,7 +1261,7 @@ static void __init tegra_ardbeg_late_init(void)
 			board_info.board_id == BOARD_P2530)
 		loki_panel_init();
 	else
-		tegra_fb_copy_or_clear();
+		ardbeg_panel_init();
 
 		/* put PEX pads into DPD mode to save additional power */
 		tegra_io_dpd_enable(&pexbias_io);
