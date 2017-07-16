@@ -42,7 +42,7 @@
 	firmware {
 		android {
 			compatible = "android,firmware";
-			hardware = "tegra";
+			hardware = "jetson-tk1";
 		};
 	};
 
@@ -197,7 +197,7 @@
 		avddio-pex-supply = <&as3722_sd4>;
 		avdd-pex-pll-supply = <&as3722_sd4>;
 		vddio-pex-ctl-supply = <&as3722_sd4>;
-		nvidia,lane-map = <0x10>;
+		nvidia,lane-map = <0x14>;
 		status = "okay";
 		pci@1,0 {
 			nvidia,disable-clock-request;

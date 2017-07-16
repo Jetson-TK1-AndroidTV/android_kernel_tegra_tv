@@ -56,7 +56,6 @@
 			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
 			nvidia,emc-clk-rate = <300000000>;
 			nvidia,cmu-enable = <1>;
-			nvidia,low-v-win = <0x2>;
 			nvidia,fb-bpp = <32>; /* bits per pixel */
 			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
 		};
@@ -164,16 +163,16 @@
 	};
 
 	pcie-controller {
-                nvidia,hot-plug-gpio = <&gpio TEGRA_GPIO(O, 1) 0>;
-                nvidia,wake-gpio = <&gpio TEGRA_GPIO(DD, 3) 0>;
 		hvdd-pex-supply = <&reg_3v3_supply>;
 		hvdd-pex-pll-e-supply = <&reg_3v3_supply>;
 		dvddio-pex-supply = <&as3722_sd4>;
 		avddio-pex-supply = <&as3722_sd4>;
 		avdd-pex-pll-supply = <&as3722_sd4>;
 		vddio-pex-ctl-supply = <&as3722_sd4>;
-		nvidia,lane-map = <0x10>;
+		nvidia,lane-map = <0x12>;
 		status = "okay";
+
+		iommus = <&smmu TEGRA_SWGROUP_AFI>;
 
 		pci@1,0 {
 			nvidia,disable-clock-request;
