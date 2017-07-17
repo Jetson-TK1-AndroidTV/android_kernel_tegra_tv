@@ -705,12 +705,12 @@ void tegra_fb_pan_display_reset(struct tegra_fb_info *fb_info)
 void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 			      struct fb_monspecs *specs,
 			      bool (*mode_filter)(const struct tegra_dc *dc,
-						  struct fb_videomode *mode))
-
+						  struct fb_videomode *bestMode))
 {
 	struct fb_event event;
 	int i;
 	int blank = FB_BLANK_NORMAL;
+	struct fb_videomode *bestMode;
 	struct tegra_dc *dc = fb_info->win.dc;
 
 	mutex_lock(&fb_info->info->lock);
@@ -725,17 +725,14 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 	fb_info->info->state = FBINFO_STATE_SUSPENDED;
 
 	if (specs == NULL) {
-		struct tegra_dc_mode mode;
 		memset(&fb_info->info->monspecs, 0x0,
 		       sizeof(fb_info->info->monspecs));
-		memset(&mode, 0x0, sizeof(mode));
 
 		/*
 		 * reset video mode properties to prevent garbage being
 		 * displayed on 'mode' device.
 		 */
 		fb_info->info->mode = (struct fb_videomode*) NULL;
-
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
 		blank = FB_BLANK_POWERDOWN;
 		console_lock();
@@ -744,6 +741,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 		fb_notifier_call_chain(FB_EVENT_BLANK, &event);
 		console_unlock();
 #endif
+
 		/* For L4T - After the next hotplug, framebuffer console will
 		 * use the old variable screeninfo by default, only video-mode
 		 * settings will be overwritten as per monitor connected.
@@ -752,7 +750,6 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 		memset(&fb_info->info->var, 0x0, sizeof(fb_info->info->var));
 #endif /* CONFIG_FRAMEBUFFER_CONSOLE */
 
-		tegra_dc_set_mode(dc, &mode);
 		mutex_unlock(&fb_info->info->lock);
 		return;
 	}
@@ -772,53 +769,51 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 		}
 	}
 
-	if (dc->out_ops->vrr_update_monspecs)
-		dc->out_ops->vrr_update_monspecs(dc,
-			&fb_info->info->modelist);
-
-	event.info = fb_info->info;
 	/* Restoring to state running. */
 	fb_info->info->state =  FBINFO_STATE_RUNNING;
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
+/*
 	console_lock();
 	tegra_dc_set_fb_mode(fb_info->win.dc, specs->modedb, false);
 	fb_videomode_to_var(&fb_info->info->var, &specs->modedb[0]);
 	fb_notifier_call_chain(FB_EVENT_MODE_CHANGE_ALL, &event);
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
 	fb_notifier_call_chain(FB_EVENT_BLANK, &event);
-	blank = FB_BLANK_UNBLANK;
-	fb_notifier_call_chain(FB_EVENT_BLANK, &event);
 	console_unlock();
+*/
+	// WORKAROUND: If pixclock of specs->modedb[0] is not supported, the kernel stops. 
+	// Therefore, we look here for the best mode (same size, highest supported pixclock)
+	fb_videomode_to_var(&fb_info->info->var, &specs->modedb[0]);
+	bestMode = (struct fb_videomode *)(fb_find_best_mode(&fb_info->info->var, &fb_info->info->modelist));
+	if(bestMode == NULL)
+	{
+		// Error, no matching mode found
+		return;
+	}
+ 	console_lock();
+ 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
+	dcmode.pclk          = bestMode->pixclock;
+ 	dcmode.pclk          = PICOS2KHZ(dcmode.pclk);
+ 	dcmode.pclk         *= 1000;
+ 	printk(">>> DBG: pclk=%d\n",dcmode.pclk);
+ 	dcmode.h_ref_to_sync = 1;
+ 	dcmode.v_ref_to_sync = 1;
+	dcmode.h_sync_width  = bestMode->hsync_len;
+	dcmode.v_sync_width  = bestMode->vsync_len;
+	dcmode.h_back_porch  = bestMode->left_margin;
+	dcmode.v_back_porch  = bestMode->upper_margin;
+	dcmode.h_active      = bestMode->xres;
+	dcmode.v_active      = bestMode->yres;
+	dcmode.h_front_porch = bestMode->right_margin;
+	dcmode.v_front_porch = bestMode->lower_margin; 	
+	tegra_dc_set_fb_mode(fb_info->win.dc, specs->modedb, false);
+ 	fb_videomode_to_var(&fb_info->info->var, bestMode);
+ 	fb_notifier_call_chain(FB_EVENT_MODE_CHANGE_ALL, &event);
+	fb_notifier_call_chain(FB_EVENT_BLANK, &event);
+ 	console_unlock();
 #else
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
 #endif
-	mutex_unlock(&fb_info->info->lock);
-}
-
-void tegra_fb_update_fix(struct tegra_fb_info *fb_info,
-				struct fb_monspecs *specs)
-{
-	struct tegra_dc *dc = fb_info->win.dc;
-	struct tegra_edid *dc_edid = dc->edid;
-	struct fb_fix_screeninfo *fix = &fb_info->info->fix;
-
-	mutex_lock(&fb_info->info->lock);
-
-	/* FB_CAP_* and TEGRA_DC_* color depth flags are shifted by 1 */
-	BUILD_BUG_ON((TEGRA_DC_Y420_30 << 1) != FB_CAP_Y420_DC_30);
-	BUILD_BUG_ON((TEGRA_DC_RGB_48 << 1) != FB_CAP_RGB_DC_48);
-	fix->capabilities = (tegra_edid_get_cd_flag(dc_edid) << 1);
-	if (tegra_edid_support_yuv422(dc_edid))
-		fix->capabilities |= FB_CAP_Y422;
-	if (tegra_edid_support_yuv444(dc_edid))
-		fix->capabilities |= FB_CAP_Y444;
-	fix->capabilities |= tegra_edid_get_ex_hdr_cap(dc_edid);
-	fix->capabilities |= tegra_edid_get_quant_cap(dc_edid);
-
-	fix->max_clk_rate = tegra_edid_get_max_clk_rate(dc_edid);
-
-	fix->colorimetry = tegra_edid_get_ex_colorimetry(dc_edid);
-
 	mutex_unlock(&fb_info->info->lock);
 }
 
