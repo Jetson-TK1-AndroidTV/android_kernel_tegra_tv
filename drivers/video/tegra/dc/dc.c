@@ -130,7 +130,7 @@ struct fb_videomode tegra_dc_vga_mode = {
 };
 
 /* needs to be big enough to be index by largest supported out->type */
-static struct tegra_dc_mode override_disp_mode[TEGRA_DC_OUT_NULL + 1];
+static struct tegra_dc_mode override_disp_mode[3];
 
 static void _tegra_dc_controller_disable(struct tegra_dc *dc);
 static void tegra_dc_disable_irq_ops(struct tegra_dc *dc, bool from_irq);
@@ -2688,72 +2688,9 @@ void tegra_dc_set_out_pin_polars(struct tegra_dc *dc,
 
 static struct tegra_dc_mode *tegra_dc_get_override_mode(struct tegra_dc *dc)
 {
-	unsigned long refresh;
-
-	if (dc->out->type == TEGRA_DC_OUT_HDMI &&
-			tegra_is_bl_display_initialized(dc->ndev->id)) {
-
-		/* For seamless HDMI, read mode parameters from bootloader
-		 * set DC configuration
-		 */
-		u32 val = 0;
-		struct tegra_dc_mode *mode = &override_disp_mode[dc->out->type];
-#ifdef CONFIG_TEGRA_NVDISPLAY
-		struct clk *parent_clk = tegra_disp_clk_get(&dc->ndev->dev,
-				dc->out->parent_clk ? : "plld2");
-#else
-		struct clk *parent_clk = clk_get_sys(NULL,
-				dc->out->parent_clk ? : "pll_d2");
-#endif
-		memset(mode, 0, sizeof(struct tegra_dc_mode));
-		mode->pclk = clk_get_rate(parent_clk);
-		mode->rated_pclk = 0;
-
-		tegra_dc_get(dc);
-		val = tegra_dc_readl(dc, DC_DISP_REF_TO_SYNC);
-		mode->h_ref_to_sync = val & 0xffff;
-		mode->v_ref_to_sync = (val >> 16) & 0xffff;
-
-		val = tegra_dc_readl(dc, DC_DISP_SYNC_WIDTH);
-		mode->h_sync_width = val & 0xffff;
-		mode->v_sync_width = (val >> 16) & 0xffff;
-
-		val = tegra_dc_readl(dc, DC_DISP_BACK_PORCH);
-		mode->h_back_porch = val & 0xffff;
-		mode->v_back_porch = (val >> 16) & 0xffff;
-
-		val = tegra_dc_readl(dc, DC_DISP_FRONT_PORCH);
-		mode->h_front_porch = val & 0xffff;
-		mode->v_front_porch = (val >> 16) & 0xffff;
-
-		val = tegra_dc_readl(dc, DC_DISP_DISP_ACTIVE);
-		mode->h_active = val & 0xffff;
-		mode->v_active = (val >> 16) & 0xffff;
-
-		/*
-		 * Implicit contract between BL and us. If CMU is enabled,
-		 * assume limited range. This sort of works because we know
-		 * BL doesn't support YUV
-		 */
-		val = tegra_dc_readl(dc, DC_DISP_DISP_COLOR_CONTROL);
-		if (val & CMU_ENABLE)
-			mode->vmode |= FB_VMODE_LIMITED_RANGE;
-
-		/* Check the freq setup by the BL, 59.94 or 60Hz
-		 * If 59.94, vmode needs to be FB_VMODE_1000DIV1001
-		 * for seamless
-		 */
-		refresh = tegra_dc_calc_refresh(mode);
-		if (refresh % 1000)
-			mode->vmode |= FB_VMODE_1000DIV1001;
-
-		tegra_dc_put(dc);
-	}
-
-	if (dc->out->type == TEGRA_DC_OUT_RGB  ||
+	if (dc->out->type == TEGRA_DC_OUT_RGB ||
 		dc->out->type == TEGRA_DC_OUT_HDMI ||
-		dc->out->type == TEGRA_DC_OUT_DSI  ||
-		dc->out->type == TEGRA_DC_OUT_NULL)
+		dc->out->type == TEGRA_DC_OUT_DSI)
 		return override_disp_mode[dc->out->type].pclk ?
 			&override_disp_mode[dc->out->type] : NULL;
 	else
@@ -2766,6 +2703,7 @@ static int tegra_dc_set_out(struct tegra_dc *dc, struct tegra_dc_out *out)
 	int err = 0;
 
 	dc->out = out;
+	mode = tegra_dc_get_override_mode(dc);
 
 	tegra_dc_set_sor_instance(dc, dc->out->type);
 
@@ -2797,7 +2735,6 @@ static int tegra_dc_set_out(struct tegra_dc *dc, struct tegra_dc_out *out)
 		dc->initialized = true;
 	}
 #endif
-	mode = tegra_dc_get_override_mode(dc);
 
 	if (mode) {
 		tegra_dc_set_mode(dc, mode);
@@ -5654,15 +5591,6 @@ static int __init tegra_dc_mode_override(char *str)
 		p += 4;
 		options = strsep(&p, ";");
 		if (parse_disp_params(options, &override_disp_mode[TEGRA_DC_OUT_DSI]))
-			return -EINVAL;
-	}
-
-	p = strstr(str, "null:");
-	if (p) {
-		p += 5;
-		options = strsep(&p, ";");
-		if (parse_disp_params(options,
-				&override_disp_mode[TEGRA_DC_OUT_NULL]))
 			return -EINVAL;
 	}
 
