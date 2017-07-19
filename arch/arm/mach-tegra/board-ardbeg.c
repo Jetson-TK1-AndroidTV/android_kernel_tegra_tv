@@ -1385,11 +1385,11 @@ static void __init tegra_ardbeg_dt_init(void)
 	tegra_get_display_board_info(&display_board_info);
 
 #ifndef CONFIG_TEGRA_HDMI_PRIMARY
-	/* In Ardbeg, zero display_board_id is considered to
-	 * Panasonic wuxga panel one */
-	tegra_set_fixed_panel_ops(true, &dsi_p_wuxga_10_1_ops,
-		"p,wuxga-10-1");
-	tegra_set_fixed_pwm_bl_ops(dsi_p_wuxga_10_1_ops.pwm_bl_ops);
+	/* 1080p edp hack, In Ardbeg, zero display_board_id is considered to
+	 * 1080p 14 inch eDP panel */
+	tegra_set_fixed_panel_ops(true, &edp_a_1080p_14_0_ops,
+		"a-edp,1080p-14-0");
+	tegra_set_fixed_pwm_bl_ops(edp_a_1080p_14_0_ops.pwm_bl_ops);
 #endif
 	bus_register_notifier(&platform_bus_type, &platform_nb);
 	bus_register_notifier(&i2c_bus_type, &i2c_nb);

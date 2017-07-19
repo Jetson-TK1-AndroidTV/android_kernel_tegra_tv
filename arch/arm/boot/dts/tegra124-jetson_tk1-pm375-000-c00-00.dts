@@ -29,10 +29,9 @@
 #include "tegra124-platforms/tegra124-jetson_tk1-io-common.dtsi"
 
 / {
-	model = "NVIDIA Tegra124 TN8";
-	compatible = "nvidia,tn8", "nvidia,tegra124";
+	model = "NVIDIA Tegra124 PM374";
+	compatible = "nvidia,jetson-tk1", "nvidia,tegra124";
 	nvidia,dtsfilename = __FILE__;
-	nvidia,boardids = "1780:1100:3","1845:1000:0","1769:1000:0","1549:1000:0";
 	#address-cells = <2>;
 	#size-cells = <2>;
 
@@ -171,8 +170,6 @@
 		vddio-pex-ctl-supply = <&as3722_sd4>;
 		nvidia,lane-map = <0x12>;
 		status = "okay";
-
-		iommus = <&smmu TEGRA_SWGROUP_AFI>;
 
 		pci@1,0 {
 			nvidia,disable-clock-request;
