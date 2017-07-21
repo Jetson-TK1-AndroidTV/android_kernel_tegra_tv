@@ -1384,7 +1384,7 @@ static void __init tegra_ardbeg_dt_init(void)
 	tegra_get_board_info(&board_info);
 	tegra_get_display_board_info(&display_board_info);
 
-#ifndef CONFIG_TEGRA_HDMI_PRIMARY
+#ifdef CONFIG_TEGRA_HDMI_PRIMARY
 	/* 1080p edp hack, In Ardbeg, zero display_board_id is considered to
 	 * 1080p 14 inch eDP panel */
 	tegra_set_fixed_panel_ops(true, &edp_a_1080p_14_0_ops,

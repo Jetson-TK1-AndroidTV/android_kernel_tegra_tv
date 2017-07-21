@@ -29,7 +29,7 @@
 #include "tegra124-platforms/tegra124-apalis-power-tree.dtsi"
 
 / {
-	model = "NVIDIA Tegra124 PM375";
+	model = "NVIDIA Tegra124 PM374";
 	compatible = "nvidia,jetson-tk1", "nvidia,tegra124";
 	nvidia,dtsfilename = __FILE__;
 	#address-cells = <2>;
@@ -37,6 +37,8 @@
 
 	chosen {
 		bootargs = "tegraid=40.0.0.00.00 vmalloc=256M video=tegrafb console=ttyS0,115200n8 earlyprintk";
+		linux,initrd-start = <0x85000000>;
+		linux,initrd-end = <0x851bc400>;
 	};
 
 	firmware {
@@ -44,10 +46,6 @@
 			compatible = "android,firmware";
 			hardware = "jetson-tk1";
 		};
-	};
-
-	psci {
-		status = "disabled";
 	};
 
 	host1x {
@@ -59,11 +57,6 @@
 			nvidia,cmu-enable = <1>;
 			nvidia,fb-bpp = <32>; /* bits per pixel */
 			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
-		};
-		hdmi {
-			hdmi-display {
-				nvidia,hdmi-vrr-caps = <1>;
-			};
 		};
 	};
 
@@ -97,7 +90,7 @@
 
 	bcmdhd_wlan {
 		fw_path = "/system/vendor/firmware/fw_bcmdhd.bin";
-		nv_path = "/system/etc/nvram_apalis-tk1_4356.txt";
+		nv_path = "/system/etc/nvram.txt";
 		country_code_map {
 			CC1 {
 				iso_abbrev = "XR";
@@ -199,6 +192,7 @@
 		vddio-pex-ctl-supply = <&as3722_sd4>;
 		nvidia,lane-map = <0x14>;
 		status = "okay";
+
 		pci@1,0 {
 			nvidia,disable-clock-request;
 			status = "okay";
