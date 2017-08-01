@@ -160,7 +160,7 @@
 				};
 
 				as3722_sd5: sd5 {
-					regulator-name = "+V1.8";
+					regulator-name = "reg-1v8-supply";
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <1800000>;
 					regulator-always-on;
@@ -345,11 +345,8 @@
 				};
 
 				as3722_ldo2: ldo2 {
-					regulator-name = "+V1.2";
-					regulator-min-microvolt = <1200000>;
-					regulator-max-microvolt = <1200000>;
-					regulator-boot-on;
-					regulator-always-on;
+				     regulator-name = "avdd-dsi-csi";
+				     regulator-boot-on;
 
 					consumers {
 						c1 {
@@ -418,7 +415,7 @@
 
 				/* 1.8V for LVDS, 3.3V for eDP */
 				as3722_ldo4: ldo4 {
-					regulator-name = "AVDD_LVDS0_PLL";
+					regulator-name = "as3722-gpio4-supply";
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <3300000>;
 					regulator-init-microvolt = <1800000>;

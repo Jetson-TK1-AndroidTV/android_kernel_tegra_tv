@@ -203,7 +203,7 @@
 		vdd_lcd_bl_en: regulator@6 {
 			compatible = "regulator-fixed-sync";
 			reg = <7>;
-			regulator-name = "BKL1_ON";
+			regulator-name = "vdd-lcd-bl-en";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			/* Apalis BKL1_ON */

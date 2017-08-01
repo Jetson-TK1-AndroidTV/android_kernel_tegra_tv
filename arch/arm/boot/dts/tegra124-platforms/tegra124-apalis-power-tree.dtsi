@@ -25,6 +25,15 @@
 	host1x {
 		/* tegradc.0 */
 		dc@54200000 {
+			avdd_dsi_csi-supply = <&as3722_ldo2>;
+			avdd_lcd-supply = <&as3722_ldo4>;
+			dvdd_lcd-supply = <&as3722_sd5>;
+			vdd_lcd_bl-supply = <&vdd_lcd_bl_en>;
+			vdd_lcd_bl_en-supply = <&vdd_lcd_bl_en>;
+		};
+
+		/* tegradc.1 */
+		dc@54240000 {
 			avdd_hdmi-supply = <&as3722_sd4>;
 			avdd_hdmi_pll-supply = <&avdd_hdmi_pll>;
 			vdd_hdmi_5v0-supply = <&vdd_hdmi>;
@@ -42,6 +51,16 @@
 
 	power-detect {
 		pwrdet-pex-ctl-supply = <&as3722_sd4>;
+		pwrdet-nand-supply = <&as3722_sd5>;
+		pwrdet-sdmmc1-supply = <&as3722_sd5>;
+		pwrdet-sdmmc4-supply = <&as3722_sd5>;
+		pwrdet-audio-supply = <&as3722_sd5>;
+		pwrdet-uart-supply = <&as3722_sd5>;
+		pwrdet-bb-supply = <&as3722_sd5>;
+		pwrdet-cam-supply = <&as3722_ldo1>;
+		pwrdet-mipi-supply = <&as3722_ldo2>;
+		pwrdet-sdmmc3-supply = <&as3722_ldo6>;
+		pwrdet-hv-supply = <&reg_3v3>;
 	};
 
 	udc@7d000000 {

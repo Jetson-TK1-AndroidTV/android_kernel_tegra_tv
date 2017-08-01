@@ -27,6 +27,7 @@
 #include "tegra124-platforms/tegra124-apalis-fixed.dtsi"
 #include "tegra124-platforms/tegra124-apalis-hdmi.dtsi"
 #include "tegra124-platforms/tegra124-apalis-power-tree.dtsi"
+#include "panel-a-1080p-14-0.dtsi"
 
 / {
 	model = "NVIDIA Tegra124 PM374";
@@ -53,10 +54,28 @@
 		dc@54200000 {
 			status = "okay";
 			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
-			nvidia,emc-clk-rate = <300000000>;
+			nvidia,emc-clk-rate = <204000000>;
 			nvidia,cmu-enable = <1>;
+			nvidia,low-v-win = <0x2>;
 			nvidia,fb-bpp = <32>; /* bits per pixel */
 			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
+		};
+		/* tegradc.1 */
+		dc@54240000 {
+			status = "okay";
+			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
+			nvidia,emc-clk-rate = <300000000>;
+			nvidia,fb-bpp = <32>; /* bits per pixel */
+			nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
+		};
+		dsi {
+			nvidia,dsi-controller-vs = <1>;
+			status = "okay";
+			panel-a-1080p-14-0 {
+				nvidia,dsi-dpd-pads = <DSIC_DPD_EN DSID_DPD_EN>;
+				nvidia,panel-rst-gpio = <&gpio TEGRA_GPIO(H, 3) 0>; /* PH3 */
+				nvidia,panel-bl-pwm-gpio = <&gpio TEGRA_GPIO(H, 1) 0>; /* PH1 */
+			};
 		};
 	};
 
@@ -100,29 +119,26 @@
 		};
 	};
 
-	/* Apalis UART1 */
-	serial@70006000 {
-		compatible = "nvidia,tegra114-uart", "nvidia,tegra20-uart";
-		status = "okay";
-	};
+        serial@70006000 {
+                compatible = "nvidia,tegra114-hsuart";
+                status = "okay";
+        };
 
-	/* Apalis UART2 */
-	serial@70006040 {
-		compatible = "nvidia,tegra114-hsuart";
-		status = "okay";
-	};
+        serial@70006040 {
+                compatible = "nvidia,tegra114-hsuart";
+                status = "okay";
+        };
 
-	/* Apalis UART3 */
-	serial@70006200 {
-		compatible = "nvidia,tegra114-hsuart";
-		status = "okay";
-	};
+        serial@70006200 {
+                compatible = "nvidia,tegra114-hsuart";
+                status = "okay";
+        };
 
-	/* Apalis UART4 */
 	serial@70006300 {
-		compatible = "nvidia,tegra114-hsuart";
+		compatible = "nvidia,tegra20-uart", "nvidia,tegra114-hsuart";
+		console-port;
+		sqa-automation-port;
 		status = "okay";
-
 	};
 
 	i2c@7000d000 {
@@ -190,7 +206,7 @@
 		avddio-pex-supply = <&as3722_sd4>;
 		avdd-pex-pll-supply = <&as3722_sd4>;
 		vddio-pex-ctl-supply = <&as3722_sd4>;
-		nvidia,lane-map = <0x14>;
+		nvidia,lane-map = <0x12>;
 		status = "okay";
 
 		pci@1,0 {
@@ -224,11 +240,6 @@
 		nvidia,ss_portmap = <0x72>; /* SSP0 on USB2P2 */
 		nvidia,lane_owner = <6>; /* USB3P0 USB3P1 */
 		nvidia,ulpicap = <0>; /* No ulpi support. can we remove */
-		status = "okay";
-	};
-
-	backlight {
-		compatible = "pwm-backlight";
 		status = "okay";
 	};
 };
