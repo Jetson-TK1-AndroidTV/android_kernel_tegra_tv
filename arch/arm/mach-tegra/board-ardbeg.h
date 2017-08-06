@@ -167,4 +167,6 @@ void tn8_sysedp_dynamic_capping_init(void);
 #define CLK_RST_CNTRL_RST_DEV_V_SET 0x7000E430
 #define SET_CEC_RST 0x100
 
+/* Apalis TK1 Specific */
+
 #endif
