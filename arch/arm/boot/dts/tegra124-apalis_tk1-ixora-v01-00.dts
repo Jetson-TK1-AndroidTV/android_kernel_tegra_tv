@@ -31,7 +31,7 @@
 
 / {
 	model = "NVIDIA Tegra124 PM374";
-	compatible = "nvidia,apalis-tk1", "nvidia,tegra124";
+	compatible = "nvidia,jetson-tk1", "nvidia,tegra124";
 	nvidia,dtsfilename = __FILE__;
 	#address-cells = <2>;
 	#size-cells = <2>;
@@ -47,6 +47,10 @@
 			compatible = "android,firmware";
 			hardware = "jetson-tk1";
 		};
+	};
+
+	psci {
+		status = "disabled";
 	};
 
 	host1x {
