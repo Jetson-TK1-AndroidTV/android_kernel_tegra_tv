@@ -40,46 +40,6 @@
 		     };
 	     };
 
-		reg_3v3: regulator@2 {
-			compatible = "regulator-fixed";
-			reg = <2>;
-			regulator-name = "reg-3v3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			regulator-always-on;
-			regulator-boot-on;
-			/* PWR_EN_+V3.3 */
-			gpio = <&as3722 2 0>;
-			enable-active-high;
-
-			consumers {
-				c1 {
-					regulator-consumer-supply = "hvdd_pex";
-					regulator-consumer-device = "tegra-pcie";
-				};
-				c2 {
-					regulator-consumer-supply = "hvdd_pex_pll";
-					regulator-consumer-device = "tegra-pcie";
-				};
-				c3 {
-					regulator-consumer-supply = "VDDA";
-					regulator-consumer-device = "4-000a";
-				};
-				c4 {
-					regulator-consumer-supply = "vddio_sd_slot";
-					regulator-consumer-device = "sdhci-tegra.0";
-				};
-				c5 {
-					regulator-consumer-supply = "vddio_sd_slot";
-					regulator-consumer-device = "sdhci-tegra.2";
-				};
-				c6 {
-					regulator-consumer-supply = "vdd";
-					regulator-consumer-device = "4-004c";
-				};
-			};
-		};
-
 		vdd_hdmi: regulator@3 {
 		  compatible = "regulator-fixed-sync";
 		  reg = <3>;
@@ -197,9 +157,44 @@
 			};
 		};
 
-		as3722_gpio2_supply: regulator@8 {
+		reg_3v3_supply: regulator@8 {
+			compatible = "regulator-fixed";
+			reg = <8>;
+			regulator-name = "reg-3v3-supply";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+
+			consumers {
+				c1 {
+					regulator-consumer-supply = "hvdd_pex";
+					regulator-consumer-device = "tegra-pcie";
+				};
+				c2 {
+					regulator-consumer-supply = "hvdd_pex_pll";
+					regulator-consumer-device = "tegra-pcie";
+				};
+				c3 {
+					regulator-consumer-supply = "VDDA";
+					regulator-consumer-device = "4-000a";
+				};
+				c4 {
+					regulator-consumer-supply = "vddio_sd_slot";
+					regulator-consumer-device = "sdhci-tegra.0";
+				};
+				c5 {
+					regulator-consumer-supply = "vddio_sd_slot";
+					regulator-consumer-device = "sdhci-tegra.2";
+				};
+				c6 {
+					regulator-consumer-supply = "vdd";
+					regulator-consumer-device = "4-004c";
+				};
+			};
+		};
+
+		as3722_gpio2_supply: regulator@9 {
 			     compatible = "regulator-fixed-sync";
-			     reg = <8>;
+			     reg = <9>;
 			     regulator-name = "as3722-gpio2-supply";
 			     regulator-min-microvolt = <3300000>;
 			     regulator-max-microvolt = <3300000>;

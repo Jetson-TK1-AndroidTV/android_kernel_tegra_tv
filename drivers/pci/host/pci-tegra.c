@@ -1813,6 +1813,9 @@ static int tegra_pcie_get_resources(struct tegra_pcie *pcie)
 		dev_err(pcie->dev, "PCIE: Failed to enable regulators\n");
 		goto err_enable_reg;
 	}
+	msleep(100);
+	/* wait 100ms for regulator to power-up */
+
 	err = tegra_pcie_power_on(pcie);
 	if (err) {
 		dev_err(pcie->dev, "PCIE: Failed to power on: %d\n", err);

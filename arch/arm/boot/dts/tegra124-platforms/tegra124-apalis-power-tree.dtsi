@@ -62,7 +62,7 @@
 		pwrdet-cam-supply = <&as3722_ldo1>;
 		pwrdet-mipi-supply = <&as3722_ldo2>;
 		pwrdet-sdmmc3-supply = <&as3722_ldo6>;
-		pwrdet-hv-supply = <&reg_3v3>;
+		pwrdet-hv-supply = <&reg_3v3_supply>;
 	};
 
 	udc@7d000000 {
