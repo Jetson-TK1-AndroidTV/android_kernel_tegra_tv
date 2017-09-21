@@ -14,16 +14,9 @@
  * more details.
  */
 
-/* This file is mainly for IO-Peripherals like SPI/I2C/USB/UART etc */
+/* This file is mainly for IO-Peripherals like SPI/I2C/USB/UART/AUDIO etc */
 
 / {
-	i2c@7000c000 {
-		rt5639: rt5639.0-001c@1c {
-			compatible = "realtek,rt5639";
-			reg = <0x1c>;
-		};
-	};
-
 	sound {
 		compatible = "nvidia,tegra-audio-rt5639";
 		nvidia,codec_name = "rt5639.0-001a";

@@ -1,7 +1,7 @@
 /*
  * arch/arm/boot/dts/tegra124-jetson_tk1-pm375-000-c00-00.dts
  *
- * Copyright (c) 2014, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
