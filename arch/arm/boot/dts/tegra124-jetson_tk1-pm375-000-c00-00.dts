@@ -21,6 +21,7 @@
 /dts-v1/;
 
 #include "tegra124-soc-shield.dtsi"
+#include "tegra124-platforms/tegra124-tn8-emc-p1761-1270-a00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-keys-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-gpio-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-pinmux-pm375-0000-c00-00.dtsi"
@@ -29,7 +30,7 @@
 #include "tegra124-platforms/tegra124-jetson_tk1-io-common.dtsi"
 
 / {
-	model = "NVIDIA Tegra124 PM374";
+	model = "NVIDIA Tegra124 PM375";
 	compatible = "nvidia,jetson-tk1", "nvidia,tegra124";
 	nvidia,dtsfilename = __FILE__;
 	#address-cells = <2>;
@@ -44,7 +45,7 @@
 	firmware {
 		android {
 			compatible = "android,firmware";
-			hardware = "jetson-tk1";
+			hardware = "tn8";
 		};
 	};
 
@@ -133,6 +134,19 @@
 		};
 	};
 
+	watchdog@60005100 {
+		status = "disabled";
+		nvidia,enable-on-init;
+		nvidia,heartbeat-init = <120>;
+		dt-override-status-odm-data = <0x80000000 0x80000000>;
+	};
+
+	soft_watchdog {
+		compatible = "softdog-platform";
+		status = "disabled";
+		dt-override-status-odm-data = <0x80000000 0x00000000>;
+	};
+
 	memory@0x80000000 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0x0 0x80000000>;
@@ -201,6 +215,36 @@
 		avdd_sata-supply = <&as3722_sd4>;
 		hvdd_sata-supply = <&as3722_gpio2_supply>;
 		vddio_pex_sata-supply = <&as3722_gpio2_supply>;
+	};
+
+	udc@7d000000 {
+		nvidia,port-otg;
+		/*xcvr-setup-offset is in 2s complement for negative values*/
+		nvidia,xcvr-setup-offset = /bits/8 <16>;
+		status = "okay";
+	};
+
+	otg@7d000000 {
+		nvidia,id-detection-type = <2>;
+		status = "okay";
+	};
+
+	ehci@7d000000 {
+		nvidia,port-otg;
+		nvidia,has-hostpc;
+		nvidia,turn_off_vbus_on_lp0;
+		nvidia,id-detection-type = <2>;
+		nvidia,hssync-start-delay = <0>;
+		nvidia,idle-wait-delay = <17>;
+		nvidia,elastic-limit = <16>;
+		nvidia,term-range-adj = <6>;
+		nvidia,xcvr-setup = <15>;
+		nvidia,xcvr-lsfslew = <2>;
+		nvidia,xcvr-lsrslew = <2>;
+		nvidia,xcvr-use-fuses;
+		nvidia,vbus-oc-map = <4>;
+		nvidia,xcvr-setup-offset = <0>;
+		status = "disabled";
 	};
 
 	backlight {
