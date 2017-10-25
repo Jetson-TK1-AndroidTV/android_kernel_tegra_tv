@@ -551,7 +551,7 @@ int __init ardbeg_sdhci_init(void)
 	if (!is_uart_over_sd_enabled())
 		platform_device_register(&tegra_sdhci_device2);
 	if (board_info.board_id != BOARD_PM359 &&
-			board_info.board_id != BOARD_PM375) {
+			board_info.board_id != BOARD_PM374) {
 		platform_device_register(&tegra_sdhci_device0);
 		ardbeg_wifi_init();
 	}
