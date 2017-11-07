@@ -30,7 +30,7 @@
 #include "tegra124-platforms/tegra124-jetson_tk1-io-common.dtsi"
 
 / {
-	model = "NVIDIA Tegra124 PM374";
+	model = "NVIDIA Tegra124 PM375";
 	compatible = "nvidia,jetson-tk1", "nvidia,tegra124";
 	nvidia,dtsfilename = __FILE__;
 	#address-cells = <2>;
