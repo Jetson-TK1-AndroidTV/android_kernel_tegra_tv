@@ -21,6 +21,7 @@
 /dts-v1/;
 
 #include "tegra124-soc-shield.dtsi"
+#include "tegra124-platforms/tegra124-comms.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-keys-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-gpio-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson_tk1-pinmux-pm375-0000-c00-00.dtsi"

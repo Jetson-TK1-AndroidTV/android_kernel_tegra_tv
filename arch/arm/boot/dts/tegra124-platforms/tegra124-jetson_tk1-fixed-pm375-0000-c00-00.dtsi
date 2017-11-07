@@ -432,11 +432,7 @@
 			 gpio = <&gpio TEGRA_GPIO(R, 0) 0>;
 
 			 consumers {
-				 c1 {
-					 regulator-consumer-supply = "vddio_sd_slot";
-					 regulator-consumer-device = "sdhci-tegra.1";
-				 };
-				 c2 {
+				 c0 {
 					 regulator-consumer-supply = "vddio_sd_slot";
 					 regulator-consumer-device = "sdhci-tegra.2";
 				 };

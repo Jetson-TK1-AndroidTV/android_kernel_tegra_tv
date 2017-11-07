@@ -21,6 +21,7 @@
 /dts-v1/;
 
 #include "tegra124-soc-shield.dtsi"
+#include "tegra124-platforms/tegra124-comms.dtsi"
 #include "tegra124-platforms/tegra124-apalis-gpio.dtsi"
 #include "tegra124-platforms/tegra124-apalis-pinmux.dtsi"
 #include "tegra124-platforms/tegra124-apalis-pmic.dtsi"
