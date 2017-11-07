@@ -19,32 +19,6 @@
 #include <dt-bindings/pinctrl/pinctrl-tegra.h>
 
 / {
-
-	i2c@7000c000 {
-                pinctrl-names = "hs_mode";
-                pinctrl-0 = <&gen1_i2c_hs_drive>;
-        };
-
-	i2c@7000c400 {
-                pinctrl-names = "hs_mode";
-                pinctrl-0 = <&gen2_i2c_hs_drive>;
-        };
-
-	i2c@7000c500 {
-                pinctrl-names = "hs_mode";
-                pinctrl-0 = <&cam_i2c_hs_drive>;
-        };
-
-	i2c@7000c700 {
-                pinctrl-names = "hs_mode";
-                pinctrl-0 = <&ddc_i2c_hs_drive>;
-        };
-
-	i2c@7000d000 {
-                pinctrl-names = "hs_mode";
-                pinctrl-0 = <&pwr_i2c_hs_drive>;
-        };
-
 	pinmux: pinmux@70000868 {
 		status = "okay";
 		pinctrl-names = "default", "drive", "unused";
@@ -452,14 +426,6 @@
 				nvidia,pull = <TEGRA_PIN_PULL_UP>;
 				nvidia,tristate = <TEGRA_PIN_ENABLE>;
 				nvidia,enable-input = <TEGRA_PIN_ENABLE>;
-			};
-
-			sdmmc3_cd_n_pv2 {
-				nvidia,pins = "sdmmc3_cd_n_pv2";
-				nvidia,function = "sdmmc3";
-				nvidia,enable-input = <TEGRA_PIN_ENABLE>;
-				nvidia,pull = <TEGRA_PIN_PULL_UP>;
-				nvidia,tristate = <TEGRA_PIN_DISABLE>;
 			};
 
 			sdmmc4_clk_pcc4 {
