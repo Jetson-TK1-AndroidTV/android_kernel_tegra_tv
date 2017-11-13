@@ -152,6 +152,11 @@ static struct i2c_board_info __initdata rt5639_board_info = {
 	I2C_BOARD_INFO("rt5639", 0x1c),
 };
 
+static struct i2c_board_info __initdata sgtl5000_board_info = {
+	/* SGTL5000 audio codec */
+	I2C_BOARD_INFO("sgtl5000", 0x0a),
+};
+
 static struct max98090_eq_cfg max98090_eq_cfg[] = {
 };
 
@@ -240,6 +245,14 @@ static void ardbeg_i2c_init(void)
 			i2c_register_board_info(0, &rt5639_board_info, 1);
 	}
 
+	if(!of_machine_is_compatible("nvidia,jetson-tk1"))
+	{
+		if (board_info.board_id == BOARD_PM375) {
+			i2c_register_board_info(0, &sgtl5000_board_info, 1);
+		} else if (board_info.board_id != BOARD_PM375)
+			i2c_register_board_info(0, &rt5639_board_info, 1);
+	}
+
 	if (board_info.board_id == BOARD_PM359 ||
 		board_info.board_id == BOARD_PM358 ||
 		board_info.board_id == BOARD_PM363 ||
@@ -283,6 +296,34 @@ static struct tegra_asoc_platform_data ardbeg_audio_pdata_rt5639 = {
 		.rate		= 16000,
 		.channels	= 2,
 		.bit_clk	= 1024000,
+	},
+};
+
+static struct tegra_asoc_platform_data apalis_tk1_audio_pdata_sgtl5000 = {
+	.gpio_hp_det		= -1,
+	.gpio_ldo1_en		= -1,
+	.gpio_spkr_en		= -1,
+	.gpio_int_mic_en	= -1,
+	.gpio_ext_mic_en	= -1,
+	.gpio_hp_mute		= -1,
+	.gpio_codec1		= -1,
+	.gpio_codec2		= -1,
+	.gpio_codec3		= -1,
+	.i2s_param[HIFI_CODEC] = {
+		.audio_port_id	= 1, /* index of below registered
+					tegra_i2s_device plus one if HDA codec
+					is activated as well */
+		.is_i2s_master	= 1, /* meaning TK1 SoC is I2S master */
+		.i2s_mode	= TEGRA_DAIFMT_I2S,
+		.sample_size	= 16,
+		.channels	= 2,
+		.bit_clk	= 1536000,
+	},
+	.i2s_param[BT_SCO] = {
+		.audio_port_id = -1,
+	},
+	.i2s_param[BASEBAND] = {
+		.audio_port_id = -1,
 	},
 };
 
@@ -369,6 +410,14 @@ static struct platform_device ardbeg_audio_device_rt5639 = {
 	.id = 0,
 	.dev = {
 		.platform_data = &ardbeg_audio_pdata_rt5639,
+	},
+};
+
+static struct platform_device apalis_tk1_audio_device_sgtl5000 = {
+	.name = "tegra-snd-apalis-tk1-sgtl5000",
+	.id = 0,
+	.dev = {
+		.platform_data = &apalis_tk1_audio_pdata_sgtl5000,
 	},
 };
 
@@ -1216,6 +1265,14 @@ static void __init tegra_ardbeg_late_init(void)
 		if (board_info.board_id == BOARD_PM374)	/* Norrin ERS */
 			platform_device_register(&norrin_audio_device_max98090);
 		else if (board_info.board_id != BOARD_PM359)
+			platform_device_register(&ardbeg_audio_device_rt5639);
+	}
+
+	if(!of_machine_is_compatible("nvidia,jetson-tk1"))
+	{
+		if (board_info.board_id == BOARD_PM375)	/* APALIS TK1 ERS */
+			platform_device_register(&apalis_tk1_audio_pdata_sgtl5000);
+		else if (board_info.board_id != BOARD_PM360)
 			platform_device_register(&ardbeg_audio_device_rt5639);
 	}
 
