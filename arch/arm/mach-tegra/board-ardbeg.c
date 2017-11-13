@@ -243,14 +243,7 @@ static void ardbeg_i2c_init(void)
 			i2c_register_board_info(0, &max98090_board_info, 1);
 		} else if (board_info.board_id != BOARD_PM359)
 			i2c_register_board_info(0, &rt5639_board_info, 1);
-	}
-
-	if(!of_machine_is_compatible("nvidia,jetson-tk1"))
-	{
-		if (board_info.board_id == BOARD_PM375) {
 			i2c_register_board_info(0, &sgtl5000_board_info, 1);
-		} else if (board_info.board_id != BOARD_PM375)
-			i2c_register_board_info(0, &rt5639_board_info, 1);
 	}
 
 	if (board_info.board_id == BOARD_PM359 ||
@@ -403,6 +396,8 @@ static void ardbeg_audio_init(void)
 
 	norrin_audio_pdata_max98090.codec_name = "max98090.0-0010";
 	norrin_audio_pdata_max98090.codec_dai_name = "HiFi";
+
+	apalis_tk1_audio_pdata_sgtl5000.codec_name = "sgtl5000.0-000a";
 }
 
 static struct platform_device ardbeg_audio_device_rt5639 = {
@@ -1266,15 +1261,8 @@ static void __init tegra_ardbeg_late_init(void)
 			platform_device_register(&norrin_audio_device_max98090);
 		else if (board_info.board_id != BOARD_PM359)
 			platform_device_register(&ardbeg_audio_device_rt5639);
-	}
-
-	if(!of_machine_is_compatible("nvidia,jetson-tk1"))
-	{
-		if (board_info.board_id == BOARD_PM375)	/* APALIS TK1 ERS */
-			platform_device_register(&apalis_tk1_audio_pdata_sgtl5000);
-		else if (board_info.board_id != BOARD_PM360)
-			platform_device_register(&ardbeg_audio_device_rt5639);
-	}
+			platform_device_register(&apalis_tk1_audio_device_sgtl5000);
+	}		
 
 	tegra_io_dpd_init();
 	if (board_info.board_id == BOARD_E2548 ||
