@@ -58,6 +58,7 @@
 #ifdef CONFIG_IGB_DCA
 #include <linux/dca.h>
 #endif
+#include <linux/ctype.h>
 #include <linux/i2c.h>
 #include "igb.h"
 
@@ -73,6 +74,9 @@ static const char igb_driver_string[] =
 static const char igb_copyright[] =
 				"Copyright (c) 2007-2013 Intel Corporation.";
 
+static char g_mac_addr[ETH_ALEN];
+static int g_usr_mac = 0;
+
 static const struct e1000_info *igb_info_tbl[] = {
 	[board_82575] = &e1000_82575_info,
 };
@@ -81,6 +85,8 @@ static DEFINE_PCI_DEVICE_TABLE(igb_pci_tbl) = {
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I354_BACKPLANE_1GBPS) },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I354_SGMII) },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I354_BACKPLANE_2_5GBPS) },
+ 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I210_TOOLS_ONLY) },
+	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I211_TOOLS_ONLY) },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I211_COPPER), board_82575 },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I210_COPPER), board_82575 },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_I210_FIBER), board_82575 },
@@ -250,6 +256,40 @@ MODULE_AUTHOR("Intel Corporation, <e1000-devel@lists.sourceforge.net>");
 MODULE_DESCRIPTION("Intel(R) Gigabit Ethernet Network Driver");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(DRV_VERSION);
+
+/* Retrieve user set MAC address */
+static int __init setup_igb_mac(char *macstr)
+{
+	int i, j;
+	unsigned char result, value;
+
+	for (i = 0; i < ETH_ALEN; i++) {
+		result = 0;
+
+		if (i != 5 && *(macstr + 2) != ':')
+			return -1;
+
+		for (j = 0; j < 2; j++) {
+			if (isxdigit(*macstr)
+			    && (value =
+				isdigit(*macstr) ? *macstr -
+				'0' : toupper(*macstr) - 'A' + 10) < 16) {
+				result = result * 16 + value;
+				macstr++;
+			} else
+				return -1;
+		}
+
+		macstr++;
+		g_mac_addr[i] = result;
+	}
+
+	g_usr_mac = 1;
+
+	return 0;
+}
+
+__setup("igb_mac=", setup_igb_mac);
 
 #define DEFAULT_MSG_ENABLE (NETIF_MSG_DRV|NETIF_MSG_PROBE|NETIF_MSG_LINK)
 static int debug = -1;
