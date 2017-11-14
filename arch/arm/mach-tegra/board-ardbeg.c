@@ -414,7 +414,7 @@ static void ardbeg_audio_init(void)
 	norrin_audio_pdata_max98090.codec_name = "max98090.0-0010";
 	norrin_audio_pdata_max98090.codec_dai_name = "HiFi";
 
-	apalis_tk1_audio_pdata_sgtl5000.codec_name = "sgtl5000.0-000a";
+	apalis_tk1_audio_pdata_sgtl5000.codec_name = "sgtl5000.4-000a";
 }
 
 static struct platform_device ardbeg_audio_device_rt5639 = {

@@ -6,7 +6,10 @@
  * 2012-02-12: Marcel Ziswiler <marcel.ziswiler@toradex.com>
  *             initial version for Apalis/Colibri T30
  *
- * Copied from tegra_wm8903.c
+ * 2017-11-11: Matthew J. Gorski
+ *             fixes for kernel 3.10.96 Apalisk TK1 v1 - 1.2
+ *
+ * Copied from tegra_rt5639.c
  * Copyright (C) 2010-2011 - NVIDIA, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,35 +28,63 @@
  */
 
 #include <asm/mach-types.h>
-
+#include <linux/of.h>
 #include <linux/clk.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
 #include <linux/slab.h>
-
+#include <linux/gpio.h>
+#include <linux/of_gpio.h>
+#include <linux/regulator/consumer.h>
+#include <linux/delay.h>
+#include <linux/sysedp.h>
+#include <linux/pm_runtime.h>
 #include <mach/tegra_asoc_pdata.h>
+#include <mach/sgtl5000_pdata.h>
 
 #include <sound/core.h>
+#include <sound/jack.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
 #include <sound/soc.h>
-
 #include "../codecs/sgtl5000.h"
 
 #include "tegra_pcm.h"
 #include "tegra_asoc_utils.h"
+#include "tegra30_ahub.h"
+#include "tegra30_i2s.h"
 
 #define DRV_NAME "tegra-snd-apalis-tk1-sgtl5000"
 
 #define DAI_LINK_HIFI			0
 #define DAI_LINK_SPDIF			1
-#define NUM_DAI_LINKS			2
+#define DAI_LINK_PCM_OFFLOAD_FE		2
+#define DAI_LINK_COMPR_OFFLOAD_FE	3
+#define DAI_LINK_I2S_OFFLOAD_BE		4
+#define NUM_DAI_LINKS			5
+
+const char *sgtl5000_i2s_dai_name[TEGRA30_NR_I2S_IFC] = {
+	"tegra30-i2s.0",
+	"tegra30-i2s.1",
+	"tegra30-i2s.2",
+	"tegra30-i2s.3",
+	"tegra30-i2s.4",
+};
 
 struct apalis_tk1_sgtl5000 {
 	struct tegra_asoc_utils_data util_data;
 	struct tegra_asoc_platform_data *pdata;
+	struct regulator *spk_reg;
+	struct regulator *dmic_reg;
+	struct regulator *cdc_en;
+	struct snd_soc_card *pcard;
+	int gpio_requested;
 	enum snd_soc_bias_level bias_level;
+	volatile int clock_enabled;
 };
+
+void tegra_asoc_enable_clocks(void);
+void tegra_asoc_disable_clocks(void);
 
 static int apalis_tk1_sgtl5000_hw_params(struct snd_pcm_substream *substream,
 					struct snd_pcm_hw_params *params)
@@ -65,6 +96,7 @@ static int apalis_tk1_sgtl5000_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_card *card = codec->card;
 	struct apalis_tk1_sgtl5000 *machine = snd_soc_card_get_drvdata(card);
 	struct tegra_asoc_platform_data *pdata = machine->pdata;
+	struct tegra30_i2s *i2s = snd_soc_dai_get_drvdata(cpu_dai);
 	int srate, mclk, i2s_daifmt;
 	int err;
 	int rate;
@@ -223,6 +255,28 @@ static struct snd_soc_ops tegra_spdif_ops = {
 	.hw_free = tegra_hw_free,
 };
 
+int tegra_offload_hw_params_be_fixup(struct snd_soc_pcm_runtime *rtd,
+			struct snd_pcm_hw_params *params)
+{
+	if (!params_rate(params)) {
+		struct snd_interval *snd_rate = hw_param_interval(params,
+						SNDRV_PCM_HW_PARAM_RATE);
+
+		snd_rate->min = snd_rate->max = 48000;
+	}
+
+	if (!params_channels(params)) {
+		struct snd_interval *snd_channels = hw_param_interval(params,
+						SNDRV_PCM_HW_PARAM_CHANNELS);
+
+		snd_channels->min = snd_channels->max = 2;
+	}
+	snd_mask_set(hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT),
+				ffs(SNDRV_PCM_FORMAT_S16_LE));
+
+	return 1;
+}
+
 /* Apalis T30 machine DAPM widgets */
 static const struct snd_soc_dapm_widget apalis_tk1_sgtl5000_dapm_widgets[] = {
         SND_SOC_DAPM_HP("Headphone Jack", NULL),
@@ -256,6 +310,7 @@ static int apalis_tk1_sgtl5000_init(struct snd_soc_pcm_runtime *rtd)
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
 	struct snd_soc_card *card = codec->card;
 	struct apalis_tk1_sgtl5000 *machine = snd_soc_card_get_drvdata(card);
+	struct tegra_asoc_platform_data *pdata = machine->pdata;
 	int ret;
 
 	machine->bias_level = SND_SOC_BIAS_STANDBY;
@@ -291,6 +346,44 @@ static struct snd_soc_dai_link apalis_tk1_sgtl5000_dai[NUM_DAI_LINKS] = {
 		.codec_dai_name = "dit-hifi",
 		.ops = &tegra_spdif_ops,
 	},
+	[DAI_LINK_PCM_OFFLOAD_FE] = {
+		.name = "offload-pcm",
+		.stream_name = "offload-pcm",
+
+		.platform_name = "tegra-offload",
+		.cpu_dai_name = "tegra-offload-pcm",
+
+		.codec_dai_name =  "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+
+		.dynamic = 1,
+	},
+	[DAI_LINK_COMPR_OFFLOAD_FE] = {
+		.name = "offload-compr",
+		.stream_name = "offload-compr",
+
+		.platform_name = "tegra-offload",
+		.cpu_dai_name = "tegra-offload-compr",
+
+		.codec_dai_name =  "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+
+		.dynamic = 1,
+	},
+	[DAI_LINK_I2S_OFFLOAD_BE] = {
+		.name = "offload-audio",
+		.stream_name = "offload-audio-pcm",
+		.codec_name = "sgtl5000.4-000a",
+		.platform_name = "tegra30-i2s.1",
+		.cpu_dai_name = "tegra30-i2s.2",
+		.codec_dai_name = "sgtl5000",
+		.ops = &apalis_tk1_sgtl5000_ops,
+
+		.no_pcm = 1,
+
+		.be_id = 0,
+		.be_hw_params_fixup = tegra_offload_hw_params_be_fixup,
+	},
 };
 
 static struct snd_soc_card snd_soc_apalis_tk1_sgtl5000 = {
@@ -315,7 +408,9 @@ static int apalis_tk1_sgtl5000_driver_probe(struct platform_device *pdev)
 	struct snd_soc_card *card = &snd_soc_apalis_tk1_sgtl5000;
 	struct apalis_tk1_sgtl5000 *machine;
 	struct tegra_asoc_platform_data *pdata;
+	struct snd_soc_codec *codec;
 	int ret;
+	int codec_id;
 
 	pdata = pdev->dev.platform_data;
 	if (!pdata) {
@@ -336,6 +431,8 @@ static int apalis_tk1_sgtl5000_driver_probe(struct platform_device *pdev)
 	if (pdata->codec_dai_name) {
 		card->dai_link[DAI_LINK_HIFI].codec_dai_name =
 			pdata->codec_dai_name;
+		card->dai_link[DAI_LINK_I2S_OFFLOAD_BE].codec_dai_name =
+			pdata->codec_dai_name;
 	}
 
 	machine = kzalloc(sizeof(struct apalis_tk1_sgtl5000), GFP_KERNEL);
@@ -345,15 +442,47 @@ static int apalis_tk1_sgtl5000_driver_probe(struct platform_device *pdev)
 	}
 
 	machine->pdata = pdata;
+	machine->pcard = card;
 
 	ret = tegra_asoc_utils_init(&machine->util_data, &pdev->dev, card);
 	if (ret)
 		goto err_free_machine;
 
+	machine->bias_level = SND_SOC_BIAS_STANDBY;
+	machine->clock_enabled = 1;
+
+	if (!gpio_is_valid(pdata->gpio_ldo1_en)) {
+		machine->cdc_en = regulator_get(&pdev->dev, "ldo1_en");
+		if (IS_ERR(machine->cdc_en)) {
+			dev_err(&pdev->dev, "ldo1_en regulator not found %ld\n",
+					PTR_ERR(machine->cdc_en));
+			machine->cdc_en = 0;
+		} else {
+			ret = regulator_enable(machine->cdc_en);
+		}
+	}
+
+	machine->spk_reg = regulator_get(&pdev->dev, "vdd_spk");
+	if (IS_ERR(machine->spk_reg)) {
+		dev_info(&pdev->dev, "No speaker regulator found\n");
+		machine->spk_reg = 0;
+	}
+
 	card->dev = &pdev->dev;
 	platform_set_drvdata(pdev, card);
 	snd_soc_card_set_drvdata(card, machine);
 
+#ifndef CONFIG_ARCH_TEGRA_2x_SOC
+	codec_id = pdata->i2s_param[HIFI_CODEC].audio_port_id;
+	sgtl5000_dai[DAI_LINK_HIFI].cpu_dai_name =
+	sgtl5000_i2s_dai_name[codec_id];
+	sgtl5000_dai[DAI_LINK_HIFI].platform_name =
+	sgtl5000_i2s_dai_name[codec_id];
+	sgtl5000_dai[DAI_LINK_I2S_OFFLOAD_BE].cpu_dai_name =
+		sgtl5000_i2s_dai_name[codec_id];
+#endif
+
+	card->dapm.idle_bias_off = 1;
 	ret = snd_soc_register_card(card);
 	if (ret) {
 		dev_err(&pdev->dev, "snd_soc_register_card failed (%d)\n",
