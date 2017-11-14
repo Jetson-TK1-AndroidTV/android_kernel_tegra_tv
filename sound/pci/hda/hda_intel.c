@@ -77,7 +77,7 @@
 #include <linux/tegra_pm_domains.h>
 #endif
 
-#ifndef CONFIG_CONFIG_MACH_ARDBEG
+#ifndef CONFIG_MACH_ARDBEG
 static int index[SNDRV_CARDS] = SNDRV_DEFAULT_IDX;
 #else
 /* Hack to have HDA sound card as 2nd one in order to have SGTL5000 on our
