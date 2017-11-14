@@ -152,7 +152,7 @@ static struct i2c_board_info __initdata rt5639_board_info = {
 	I2C_BOARD_INFO("rt5639", 0x1c),
 };
 
-static struct i2c_board_info __initdata sgtl5000_board_info = {
+static struct i2c_board_info __initdata apalis_tk1_sgtl5000_board_info = {
 	/* SGTL5000 audio codec */
 	I2C_BOARD_INFO("sgtl5000", 0x0a),
 };
@@ -243,8 +243,13 @@ static void ardbeg_i2c_init(void)
 			i2c_register_board_info(0, &max98090_board_info, 1);
 		} else if (board_info.board_id != BOARD_PM359)
 			i2c_register_board_info(0, &rt5639_board_info, 1);
-			i2c_register_board_info(0, &sgtl5000_board_info, 1);
 	}
+
+        if (board_info.board_id == BOARD_PM375) {
+		i2c_register_board_info(0, &apalis_tk1_sgtl5000_board_info, 1);
+        } else {
+                i2c_register_board_info(0, &rt5639_board_info, 1);
+        }
 
 	if (board_info.board_id == BOARD_PM359 ||
 		board_info.board_id == BOARD_PM358 ||
@@ -870,6 +875,8 @@ static struct of_dev_auxdata ardbeg_auxdata_lookup[] __initdata = {
 #endif
 	OF_DEV_AUXDATA("nvidia,tegra-audio-rt5639", 0x0, "tegra-snd-rt5639",
 		NULL),
+	OF_DEV_AUXDATA("nvidia,tegra-audio-sgtl5000", 0x0, "tegra-snd-apalis-tk1-sgtl5000",
+		NULL),
 	OF_DEV_AUXDATA("nvidia,icera-i500", 0, "tegra_usb_modem_power", NULL),
 	OF_DEV_AUXDATA("nvidia,ptm", 0x7081c000, "ptm", NULL),
 	OF_DEV_AUXDATA("nvidia,tegra30-hda", 0x70030000, "tegra30-hda", NULL),
@@ -1261,8 +1268,13 @@ static void __init tegra_ardbeg_late_init(void)
 			platform_device_register(&norrin_audio_device_max98090);
 		else if (board_info.board_id != BOARD_PM359)
 			platform_device_register(&ardbeg_audio_device_rt5639);
-			platform_device_register(&apalis_tk1_audio_device_sgtl5000);
-	}		
+	}
+
+        if (board_info.board_id == BOARD_PM375) {
+		platform_device_register(&apalis_tk1_audio_device_sgtl5000);
+        } else {
+                platform_device_register(&ardbeg_audio_device_rt5639);
+        }		
 
 	tegra_io_dpd_init();
 	if (board_info.board_id == BOARD_E2548 ||

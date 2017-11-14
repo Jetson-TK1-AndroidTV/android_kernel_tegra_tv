@@ -35,6 +35,16 @@
 		};
 	};
 
+	sound {
+		ldoen-supply = <&vdd_cdc_1v2_aud>;
+		dbvdd-supply = <&reg_1v8_supply>;
+		avdd-supply = <&reg_1v8_supply>;
+		dmicvdd-supply = <&reg_1v8_supply>;
+		spkvdd-supply = <&reg_5v0_supply>;
+		vdd-aud-dgtl-supply = <&reg_1v8_supply>;
+		avdd-aud-supply = <&reg_1v8_supply>;
+	};
+
 
 	efuse@7000f800 {
 		vpp_fuse-supply = <&as3722_ldo11>;

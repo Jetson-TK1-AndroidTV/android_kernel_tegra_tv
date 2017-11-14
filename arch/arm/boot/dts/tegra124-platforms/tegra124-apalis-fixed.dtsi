@@ -200,9 +200,150 @@
 			};
 		};
 
-		vdd_lcd_bl_en: regulator@6 {
+		reg_1v8_supply: regulator@6 {
 			compatible = "regulator-fixed-sync";
-			reg = <7>;
+			reg = <6>;
+			regulator-name = "reg-1v8-supply";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+
+			consumers {
+				c1 {
+					regulator-consumer-supply = "avdd_lvds0_pll";
+				};
+				c2 {
+					regulator-consumer-supply = "dvdd_lcd";
+				};
+				c3 {
+					regulator-consumer-supply = "vdd_ds_1v8";
+				};
+				c4 {
+					regulator-consumer-supply = "avdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c5 {
+					regulator-consumer-supply = "dbvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c6 {
+					regulator-consumer-supply = "avdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c7 {
+					regulator-consumer-supply = "dbvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c8 {
+					regulator-consumer-supply = "dmicvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c9 {
+					regulator-consumer-supply = "dmicvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c10 {
+					regulator-consumer-supply = "vdd_1v8b_nfc";
+				};
+				c11 {
+					regulator-consumer-supply = "vdd_1v8_sensor";
+				};
+				c12 {
+					regulator-consumer-supply = "vdd_1v8_sdmmc";
+				};
+				c13 {
+					regulator-consumer-supply = "vdd_kp_1v8";
+				};
+				c14 {
+					regulator-consumer-supply = "vdd_tp_1v8";
+				};
+				c15 {
+					regulator-consumer-supply = "vdd_modem_1v8";
+				};
+				c16 {
+					regulator-consumer-supply = "vdd_1v8b";
+					regulator-consumer-device = "0-0048";
+				};
+				c17 {
+					regulator-consumer-supply = "dvdd";
+					regulator-consumer-device = "spi0.0";
+				};
+				c18 {
+					regulator-consumer-supply = "vlogic";
+					regulator-consumer-device = "0-0069";
+				};
+				c19 {
+					regulator-consumer-supply = "vid";
+					regulator-consumer-device = "0-000c";
+				};
+				c20 {
+					regulator-consumer-supply = "vddio";
+					regulator-consumer-device = "0-0077";
+				};
+				c21 {
+					regulator-consumer-supply = "avdd_pll_utmip";
+					regulator-consumer-device = "tegra-udc.0";
+				};
+				c22 {
+					regulator-consumer-supply = "avdd_pll_utmip";
+					regulator-consumer-device = "tegra-ehci.0";
+				};
+				c23 {
+					regulator-consumer-supply = "avdd_pll_utmip";
+					regulator-consumer-device = "tegra-ehci.1";
+				};
+				c24 {
+					regulator-consumer-supply = "avdd_pll_utmip";
+					regulator-consumer-device = "tegra-ehci.2";
+				};
+				c25 {
+					regulator-consumer-supply = "avdd_pll_utmip";
+					regulator-consumer-device = "tegra-xhci";
+				};
+			};
+		};
+
+		vdd_cdc_1v2_aud: regulator@7 {
+			 compatible = "regulator-fixed-sync";
+			 reg = <7>;
+			 regulator-name = "vdd-cdc-1v2-aud";
+			 regulator-min-microvolt = <1200000>;
+			 regulator-max-microvolt = <1200000>;
+			 enable-active-high;
+			 gpio = <&gpio TEGRA_GPIO(R, 2) 0>;
+			 startup-delay-us = <250000>;
+			 consumers {
+				 c1 {
+					 regulator-consumer-supply = "ldoen";
+					 regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				 };
+			 };
+		 };
+
+		reg_5v0_supply: regulator@8 {
+			compatible = "regulator-fixed-sync";
+			reg = <8>;
+			regulator-name = "reg-5v0-supply";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+
+			consumers {
+				c1 {
+					regulator-consumer-supply = "spkvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c2 {
+					regulator-consumer-supply = "spkvdd";
+					regulator-consumer-device = "tegra-snd-apalis-tk1-sgtl5000.0";
+				};
+				c3 {
+					regulator-consumer-supply = "vdd_5v0_sensor";
+				};
+			};
+		};
+
+		vdd_lcd_bl_en: regulator@9 {
+			compatible = "regulator-fixed-sync";
+			reg = <9>;
 			regulator-name = "BKL1_ON";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;

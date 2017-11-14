@@ -401,11 +401,17 @@ static int apalis_tk1_sgtl5000_driver_remove(struct platform_device *pdev)
 	return 0;
 }
 
+static const struct of_device_id apalis_tk1_sgtl5000_of_match[] = {
+        { .compatible = "nvidia,tegra-audio-sgtl5000", },
+        {},
+};
+
 static struct platform_driver apalis_tk1_sgtl5000_driver = {
 	.driver = {
 		.name = DRV_NAME,
 		.owner = THIS_MODULE,
 		.pm = &snd_soc_pm_ops,
+		.of_match_table = apalis_tk1_sgtl5000_of_match,
 	},
 	.probe = apalis_tk1_sgtl5000_driver_probe,
 	.remove = apalis_tk1_sgtl5000_driver_remove,
