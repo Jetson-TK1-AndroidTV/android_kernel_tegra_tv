@@ -20,7 +20,7 @@
 	i2c@7000c000 {
 		rt5639: rt5639.0-001c@1c {
 			compatible = "realtek,rt5639";
-			reg = <0x1c>;
+			reg = <0x0a>;
 		};
 	};
 
