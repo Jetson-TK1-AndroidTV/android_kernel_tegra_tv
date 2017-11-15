@@ -71,6 +71,9 @@ const char *apalis_tk1_sgtl5000_i2s_dai_name[TEGRA30_NR_I2S_IFC] = {
 	"tegra30-i2s.4",
 };
 
+#define GPIO_HP_MUTE    BIT(1)
+#define GPIO_HP_DET     BIT(4)
+
 struct apalis_tk1_sgtl5000 {
 	struct tegra_asoc_utils_data util_data;
 	struct tegra_asoc_platform_data *pdata;
@@ -254,6 +257,23 @@ static struct snd_soc_ops tegra_spdif_ops = {
 	.hw_free = tegra_hw_free,
 };
 
+static int apalis_tk1_sgtl5000_event_hp(struct snd_soc_dapm_widget *w,
+					struct snd_kcontrol *k, int event)
+{
+	struct snd_soc_dapm_context *dapm = w->dapm;
+	struct snd_soc_card *card = dapm->card;
+	struct apalis_tk1_sgtl5000 *machine = snd_soc_card_get_drvdata(card);
+	struct tegra_asoc_platform_data *pdata = machine->pdata;
+
+	if (!(machine->gpio_requested & GPIO_HP_MUTE))
+		return 0;
+
+	gpio_set_value_cansleep(pdata->gpio_hp_mute,
+				!SND_SOC_DAPM_EVENT_ON(event));
+
+	return 0;
+}
+
 int tegra_offload_hw_params_be_fixup(struct snd_soc_pcm_runtime *rtd,
 			struct snd_pcm_hw_params *params)
 {
@@ -278,7 +298,7 @@ int tegra_offload_hw_params_be_fixup(struct snd_soc_pcm_runtime *rtd,
 
 /* Apalis T30 machine DAPM widgets */
 static const struct snd_soc_dapm_widget apalis_tk1_sgtl5000_dapm_widgets[] = {
-        SND_SOC_DAPM_HP("Headphone Jack", NULL),
+        SND_SOC_DAPM_HP("Headphone Jack", apalis_tk1_sgtl5000_event_hp),
         SND_SOC_DAPM_LINE("Line In Jack", NULL),
         SND_SOC_DAPM_MIC("Mic Jack", NULL),
 };
