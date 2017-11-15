@@ -1,5 +1,5 @@
 /*
- * SoC audio driver for Toradex Apalis TK1
+ * SoC audio driver for SGTL5000 codec
  *
  * Copyright (C) 2012-2016 Toradex Inc.
  *
