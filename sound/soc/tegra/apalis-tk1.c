@@ -63,7 +63,7 @@
 #define DAI_LINK_I2S_OFFLOAD_BE		4
 #define NUM_DAI_LINKS			5
 
-const char *sgtl5000_i2s_dai_name[TEGRA30_NR_I2S_IFC] = {
+const char *apalis_tk1_sgtl5000_i2s_dai_name[TEGRA30_NR_I2S_IFC] = {
 	"tegra30-i2s.0",
 	"tegra30-i2s.1",
 	"tegra30-i2s.2",
@@ -96,7 +96,6 @@ static int apalis_tk1_sgtl5000_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_card *card = codec->card;
 	struct apalis_tk1_sgtl5000 *machine = snd_soc_card_get_drvdata(card);
 	struct tegra_asoc_platform_data *pdata = machine->pdata;
-	struct tegra30_i2s *i2s = snd_soc_dai_get_drvdata(cpu_dai);
 	int srate, mclk, i2s_daifmt;
 	int err;
 	int rate;
@@ -310,7 +309,6 @@ static int apalis_tk1_sgtl5000_init(struct snd_soc_pcm_runtime *rtd)
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
 	struct snd_soc_card *card = codec->card;
 	struct apalis_tk1_sgtl5000 *machine = snd_soc_card_get_drvdata(card);
-	struct tegra_asoc_platform_data *pdata = machine->pdata;
 	int ret;
 
 	machine->bias_level = SND_SOC_BIAS_STANDBY;
@@ -407,8 +405,7 @@ static int apalis_tk1_sgtl5000_driver_probe(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = &snd_soc_apalis_tk1_sgtl5000;
 	struct apalis_tk1_sgtl5000 *machine;
-	struct tegra_asoc_platform_data *pdata;
-	struct snd_soc_codec *codec;
+	struct tegra_asoc_platform_data *pdata = NULL;
 	int ret;
 	int codec_id;
 
@@ -474,12 +471,12 @@ static int apalis_tk1_sgtl5000_driver_probe(struct platform_device *pdev)
 
 #ifndef CONFIG_ARCH_TEGRA_2x_SOC
 	codec_id = pdata->i2s_param[HIFI_CODEC].audio_port_id;
-	sgtl5000_dai[DAI_LINK_HIFI].cpu_dai_name =
-	sgtl5000_i2s_dai_name[codec_id];
-	sgtl5000_dai[DAI_LINK_HIFI].platform_name =
-	sgtl5000_i2s_dai_name[codec_id];
-	sgtl5000_dai[DAI_LINK_I2S_OFFLOAD_BE].cpu_dai_name =
-		sgtl5000_i2s_dai_name[codec_id];
+	apalis_tk1_sgtl5000_dai[DAI_LINK_HIFI].cpu_dai_name =
+	apalis_tk1_sgtl5000_i2s_dai_name[codec_id];
+	apalis_tk1_sgtl5000_dai[DAI_LINK_HIFI].platform_name =
+	apalis_tk1_sgtl5000_i2s_dai_name[codec_id];
+	apalis_tk1_sgtl5000_dai[DAI_LINK_I2S_OFFLOAD_BE].cpu_dai_name =
+		apalis_tk1_sgtl5000_i2s_dai_name[codec_id];
 #endif
 
 	card->dapm.idle_bias_off = 1;
