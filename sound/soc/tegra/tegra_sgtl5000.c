@@ -346,8 +346,8 @@ static int apalis_tk1_sgtl5000_init(struct snd_soc_pcm_runtime *rtd)
 
 static struct snd_soc_dai_link apalis_tk1_sgtl5000_dai[NUM_DAI_LINKS] = {
 	[DAI_LINK_HIFI] = {
-		.name = "SGTL5000",
-		.stream_name = "SGTL5000 PCM",
+		.name = "sgtl5000",
+		.stream_name = "sgtl5000 PCM",
 		.codec_name = "sgtl5000.4-000a",
 		.platform_name = "tegra30-i2s.2",
 		.cpu_dai_name = "tegra30-i2s.2",
@@ -405,7 +405,7 @@ static struct snd_soc_dai_link apalis_tk1_sgtl5000_dai[NUM_DAI_LINKS] = {
 };
 
 static struct snd_soc_card snd_soc_apalis_tk1_sgtl5000 = {
-	.name = "Toradex Apalis TK1 SGTL5000",
+	.name = "tegra-sgtl5000",
 	.owner = THIS_MODULE,
 	.dai_link = apalis_tk1_sgtl5000_dai,
 	.num_links = ARRAY_SIZE(apalis_tk1_sgtl5000_dai),
