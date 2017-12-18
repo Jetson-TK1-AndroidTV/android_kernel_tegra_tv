@@ -26,7 +26,6 @@
 #include "tegra124-platforms/tegra124-jetson_tk1-pinmux-pm375-0000-c00-00.dtsi"
 #include "tegra124-platforms/tegra124-jetson-power-tree-pm375-0000-c00.dtsi"
 #include "tegra124-platforms/tegra124-laguna-hdmi-pm375-1000-a00.dtsi"
-#include "tegra124-platforms/tegra124-jetson_tk1-io-common.dtsi"
 
 / {
 	model = "NVIDIA Tegra124 PM374";
