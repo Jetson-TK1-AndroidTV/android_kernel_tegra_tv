@@ -307,7 +307,7 @@ static DEFINE_PCI_DEVICE_TABLE(rtl8169_pci_tbl) = {
 MODULE_DEVICE_TABLE(pci, rtl8169_pci_tbl);
 
 static int rx_buf_sz = 16383;
-static int use_dac;
+static int use_dac = -1;
 static struct {
 	u32 msg_enable;
 } debug = { -1 };
@@ -6992,7 +6992,7 @@ rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(64)) < 0) &&
 			(pci_set_dma_mask(pdev, DMA_BIT_MASK(32))) < 0) {
 			netif_err(tp, probe, dev, "DMA configuration failed\n");
-			goto err_out_free_res_3;
+			goto err_out_unmap_4;
 		}
 	}
 
@@ -7109,7 +7109,7 @@ rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	rc = register_netdev(dev);
 	if (rc < 0)
-		goto err_out_msi_4;
+		goto err_out_msi_5;
 
 	pci_set_drvdata(pdev, dev);
 
@@ -7139,10 +7139,11 @@ rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 out:
 	return rc;
 
-err_out_msi_4:
+err_out_msi_5:
 	netif_napi_del(&tp->napi);
 	rtl_disable_msi(pdev, tp);
-	iounmap(ioaddr);
+err_out_unmap_4:
+ 	iounmap(ioaddr);
 err_out_free_res_3:
 	pci_release_regions(pdev);
 err_out_mwi_2:
