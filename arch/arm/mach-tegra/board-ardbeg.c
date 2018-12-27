@@ -1,3 +1,5 @@
+
+
 /*
  * arch/arm/mach-tegra/board-ardbeg.c
  *
@@ -1465,8 +1467,8 @@ static const char *const apalis_tk1_dt_board_compat[] = {
 	NULL
 };
 
-static const char *const nyanbig_tk1_dt_board_compat[] = {
-	"nvidia,nyanbig-tk1",
+static const char *const yellowstone_dt_board_compat[] = {
+	"google,yellowstone",
 	NULL
 };
 
@@ -1603,7 +1605,7 @@ DT_MACHINE_START(APALIS_TK1, "apalis-tk1")
 	.init_late      = tegra_init_late
 MACHINE_END
 
-DT_MACHINE_START(NYANBIG_TK1, "nyanbig-tk1")
+DT_MACHINE_START(YELLOWSTONE, "yellowstone")
 	.atag_offset	= 0x100,
 	.smp		= smp_ops(tegra_smp_ops),
 	.map_io		= tegra_map_common_io,
@@ -1612,6 +1614,6 @@ DT_MACHINE_START(NYANBIG_TK1, "nyanbig-tk1")
 	.init_irq	= irqchip_init,
 	.init_time	= clocksource_of_init,
 	.init_machine	= tegra_ardbeg_dt_init,
-	.dt_compat	= nyanbig_tk1_dt_board_compat,
+	.dt_compat	= yellowstone_dt_board_compat,
 	.init_late      = tegra_init_late
 MACHINE_END

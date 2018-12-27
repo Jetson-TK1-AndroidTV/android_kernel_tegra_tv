@@ -18,7 +18,7 @@ GCOV_PROFILE_panel-s-edp-wqxgap-15-6.o := n
 GCOV_PROFILE_panel-s-wqxga-10-1.o := n
 GCOV_PROFILE_panel-s-wuxga-7-0.o := n
 GCOV_PROFILE_panel-s-wuxga-8-0.o := n
-
+GCOV_PROFILE_panel-j-wuxga-7.o := n
 
 asflags-y				+= -march=armv7-a
 subdir-ccflags-y := -Werror
@@ -106,6 +106,7 @@ obj-y                                   += panel-c-lvds-1366-14.o
 obj-y                                   += panel-a-1080p-14-0.o
 obj-y                                   += panel-j-1440-810-5-8.o
 obj-y                                   += panel-j-720p-5.o
+obj-y					+= panel-j-wuxga-7.o
 obj-y                                   += panel-l-720p-5-loki.o
 obj-y                                   += panel-s-edp-uhdtv-15-6.o
 obj-y                                   += panel-o-720p-6-0.o
@@ -118,7 +119,7 @@ obj-${CONFIG_MACH_ARDBEG}               += board-ardbeg-memory.o
 obj-${CONFIG_MACH_ARDBEG}               += board-ardbeg-power.o
 obj-${CONFIG_MACH_ARDBEG}               += board-norrin-power.o
 obj-${CONFIG_MACH_ARDBEG}               += board-norrin-memory.o
-obj-${CONFIG_MACH_ARDBEG}               += panel-a-1080p-11-6.o
+obj-${CONFIG_MACH_ARDBEG}               += panel-j-wuxga-7.o
 obj-${CONFIG_MACH_ARDBEG}               += panel-s-edp-wqxgap-15-6.o
 ifeq ($(CONFIG_MACH_ARDBEG),y)
 obj-${CONFIG_SYSEDP_FRAMEWORK}          += board-tn8-sysedp.o
@@ -131,7 +132,7 @@ obj-${CONFIG_MACH_LOKI}               	+= board-loki-panel.o
 obj-${CONFIG_MACH_LOKI}               	+= board-loki-memory.o
 obj-${CONFIG_MACH_LOKI}               	+= board-loki-power.o
 obj-${CONFIG_MACH_LOKI}               	+= board-loki-sdhci.o
-obj-${CONFIG_MACH_LOKI}               	+= panel-a-1080p-11-6.o
+obj-${CONFIG_MACH_LOKI}               	+= panel-j-wuxga-7.o
 
 obj-${CONFIG_MACH_LAGUNA}               += board-ardbeg.o
 obj-${CONFIG_MACH_LAGUNA}               += board-ardbeg-sdhci.o

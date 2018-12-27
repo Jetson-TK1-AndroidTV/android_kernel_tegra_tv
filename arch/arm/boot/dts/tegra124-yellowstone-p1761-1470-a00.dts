@@ -1,0 +1,48 @@
+/dts-v1/;
+
+/** YellowStone is designed based on p1761 TN8 board **/
+#include "tegra124-tn8.dtsi"
+
+/** emc module is based on p1761, including 924MHz **/
+#include "tegra124-platforms/tegra124-tn8-emc-p1761-1470-a00.dtsi"
+
+/** power module is based on p1735/6 */
+#include "tegra124-platforms/tegra124-tn8-pmic-e1736-1000-a00.dtsi"
+#include "tegra124-platforms/tegra124-tn8-fixed-e1736-1000-a00.dtsi"
+
+/** pinmux for peripheral componets p1761 */
+#include "tegra124-platforms/tegra124-tn8-pinmux-p1761-1470-a00.dtsi"
+#include "tegra124-platforms/tegra124-tn8-gpio-p1761-1470-a00.dtsi"
+
+/** pinmux for peripheral componets p1780 */
+#include "tegra124-platforms/tegra124-tn8-keys-e1780-1100-a02.dtsi"
+
+#include "panel-j-wuxga-7.dtsi"
+#include "tegra124-platforms/tegra124-tn8-hdmi-e1780-1100-a00.dtsi"
+
+/ {
+	model = "Google Project Tango YellowStone";
+	compatible = "google,yellowstone", "nvidia,tn8", "nvidia,tegra124";
+	nvidia,dtsfilename = __FILE__;
+	nvidia,boardids = "1761:1470:0";
+	#address-cells = <2>;
+        #size-cells = <2>;
+
+	chosen {
+		bootargs = "tegraid=40.0.0.00.00 vmalloc=256M video=tegrafb console=ttyS0,115200n8 earlyprintk";
+		linux,initrd-start = <0x85000000>;
+		linux,initrd-end = <0x851bc400>;
+	};
+
+	host1x {
+		dsi {
+			nvidia,dsi-controller-vs = <1>;
+			status = "okay";
+			panel-j-wuxga-7 {
+				nvidia,dsi-panel-rst-gpio = <&gpio TEGRA_GPIO(H, 3) 0>; /* PH3 */
+				nvidia,dsi-panel-bl-pwm-gpio = <&gpio TEGRA_GPIO(H, 1) 0>; /* PH1 */
+			};
+		};
+	};
+};
+

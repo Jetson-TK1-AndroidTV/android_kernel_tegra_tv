@@ -326,6 +326,8 @@ static bool tegra_available_pwm_bl_ops_register(struct device *dev)
 		dev_set_drvdata(dev, dsi_j_1440_810_5_8_ops.pwm_bl_ops);
 	} else if (of_device_is_compatible(np_bl, "s,wuxga-7-0-bl")) {
 		dev_set_drvdata(dev, dsi_s_wuxga_7_0_ops.pwm_bl_ops);
+        } else if (of_device_is_compatible(np_bl, "p,wuxga-7-bl")) {
+                dev_set_drvdata(dev, dsi_j_wuxga_7_ops.pwm_bl_ops);
 	} else if (of_device_is_compatible(np_bl, "s,wuxga-8-0-bl")) {
 		dev_set_drvdata(dev, dsi_s_wuxga_8_0_ops.pwm_bl_ops);
 	} else if (of_device_is_compatible(np_bl, "a,wuxga-8-0-bl")) {
@@ -626,10 +628,10 @@ static struct device_node
 	switch (display_board.board_id) {
 	case BOARD_E1627:
 	case BOARD_E1797:
-		np_panel = of_find_compatible_node(NULL, NULL, "p,wuxga-10-1");
+		np_panel = of_find_compatible_node(NULL, NULL, "j,wuxga-7");
 		if (np_panel && pdata && dc_out)
 			tegra_panel_register_ops(dc_out,
-				&dsi_p_wuxga_10_1_ops);
+				&dsi_j_wuxga_7_ops);
 		break;
 	case BOARD_E1549:
 		np_panel = of_find_compatible_node(NULL, NULL, "lg,wxga-7");

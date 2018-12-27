@@ -71,6 +71,7 @@ struct generic_bl_data_dt_ops {
 	int (*notify)(struct device *dev, int brightness);
 };
 
+extern struct tegra_panel_ops dsi_j_wuxga_7_ops;
 extern struct tegra_panel_ops dsi_p_wuxga_10_1_ops;
 extern struct tegra_panel_ops dsi_lgd_wxga_7_0_ops;
 extern struct tegra_panel_ops dsi_s_wqxga_10_1_ops;
@@ -96,6 +97,7 @@ extern const char *fixed_secondary_panel_compatible;
 
 extern struct pwm_bl_data_dt_ops *fixed_pwm_bl_ops;
 
+extern struct tegra_panel dsi_j_wuxga_7;
 extern struct tegra_panel dsi_p_wuxga_10_1;
 extern struct tegra_panel dsi_a_1080p_11_6;
 extern struct tegra_panel dsi_s_wqxga_10_1;
