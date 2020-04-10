@@ -120,23 +120,25 @@
  * Standard timing and size defines.
  * These values should follow the ieee80211 specifications.
  */
+
+// CHANGES:
+
 #define ACK_SIZE		14
 #define IEEE80211_HEADER	24
 #define PLCP			48
 #define BEACON			100
 #define PREAMBLE		144
 #define SHORT_PREAMBLE		72
-#define SLOT_TIME		20
-#define SHORT_SLOT_TIME		9
+#define SLOT_TIME		1
+#define SHORT_SLOT_TIME		1
 #define SIFS			10
 #define PIFS			( SIFS + SLOT_TIME )
 #define SHORT_PIFS		( SIFS + SHORT_SLOT_TIME )
 #define DIFS			( PIFS + SLOT_TIME )
 #define SHORT_DIFS		( SHORT_PIFS + SHORT_SLOT_TIME )
-#define EIFS			( SIFS + DIFS + \
-				  GET_DURATION(IEEE80211_HEADER + ACK_SIZE, 10) )
-#define SHORT_EIFS		( SIFS + SHORT_DIFS + \
-				  GET_DURATION(IEEE80211_HEADER + ACK_SIZE, 10) )
+#define EIFS			0
+#define SHORT_EIFS		0
+
 
 /*
  * Structure for average calculation

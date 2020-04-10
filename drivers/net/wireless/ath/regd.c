@@ -14,6 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+// CHANGES: - changed frequency range to 2312-2732
+//          - allowed channel 12, 13 and 14 for all
+//          - removed 802.11b only restriction for channel 14
+//          - increased txpower to 30 in ATH9K_2GHZ_ ... REGRULES
+//	    - always return 0 for radar detection
+
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/kernel.h>
@@ -76,9 +82,8 @@ static const struct ieee80211_regdomain ath_world_regdom_63_65 = {
 	.n_reg_rules = 4,
 	.alpha2 =  "99",
 	.reg_rules = {
-		ATH9K_2GHZ_CH01_11,
-		ATH9K_2GHZ_CH12_13,
-		ATH9K_5GHZ_NO_MIDBAND,
+		ATH9K_2GHZ_ALL,
+		ATH9K_5GHZ_ALL,
 	}
 };
 
@@ -87,8 +92,8 @@ static const struct ieee80211_regdomain ath_world_regdom_64 = {
 	.n_reg_rules = 3,
 	.alpha2 =  "99",
 	.reg_rules = {
-		ATH9K_2GHZ_CH01_11,
-		ATH9K_5GHZ_NO_MIDBAND,
+		ATH9K_2GHZ_ALL,
+		ATH9K_5GHZ_ALL,
 	}
 };
 
@@ -97,7 +102,7 @@ static const struct ieee80211_regdomain ath_world_regdom_66_69 = {
 	.n_reg_rules = 3,
 	.alpha2 =  "99",
 	.reg_rules = {
-		ATH9K_2GHZ_CH01_11,
+		ATH9K_2GHZ_ALL,
 		ATH9K_5GHZ_ALL,
 	}
 };
@@ -107,8 +112,7 @@ static const struct ieee80211_regdomain ath_world_regdom_67_68_6A_6C = {
 	.n_reg_rules = 4,
 	.alpha2 =  "99",
 	.reg_rules = {
-		ATH9K_2GHZ_CH01_11,
-		ATH9K_2GHZ_CH12_13,
+		ATH9K_2GHZ_ALL,
 		ATH9K_5GHZ_ALL,
 	}
 };
@@ -174,7 +178,8 @@ EXPORT_SYMBOL(ath_is_49ghz_allowed);
 /* Frequency is one where radar detection is required */
 static bool ath_is_radar_freq(u16 center_freq)
 {
-	return (center_freq >= 5260 && center_freq <= 5700);
+//	return (center_freq >= 5260 && center_freq <= 5700);
+	return 0;
 }
 
 /*

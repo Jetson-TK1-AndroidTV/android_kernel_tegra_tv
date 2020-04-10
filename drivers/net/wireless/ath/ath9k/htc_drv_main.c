@@ -229,6 +229,12 @@ void ath9k_htc_reset(struct ath9k_htc_priv *priv)
 			channel->center_freq, ret);
 	}
 
+	// CHANGES: disable physical carrier sense
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_CH_IDLE_HIGH);
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_RX_CLEAR);
+
+//	printk("!!! carrier sense disabled !!!\n");
+
 	ath9k_cmn_update_txpow(ah, priv->curtxpow, priv->txpowlimit,
 			       &priv->curtxpow);
 
@@ -298,6 +304,12 @@ static int ath9k_htc_set_channel(struct ath9k_htc_priv *priv,
 			channel->center_freq, ret);
 		goto err;
 	}
+
+	// CHANGES: disable physical carrier sense
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_CH_IDLE_HIGH);
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_RX_CLEAR);
+
+//	printk("!!! carrier sense disabled !!!\n");
 
 	ath9k_cmn_update_txpow(ah, priv->curtxpow, priv->txpowlimit,
 			       &priv->curtxpow);
@@ -941,6 +953,13 @@ static int ath9k_htc_start(struct ieee80211_hw *hw)
 		mutex_unlock(&priv->mutex);
 		return ret;
 	}
+
+	// CHANGES: disable physical carrier sense
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_CH_IDLE_HIGH);
+//	REG_SET_BIT(ah, AR_DIAG_SW, AR_DIAG_FORCE_RX_CLEAR);
+
+//	printk("!!! carrier sense disabled !!!\n");
+
 
 	ath9k_cmn_update_txpow(ah, priv->curtxpow, priv->txpowlimit,
 			       &priv->curtxpow);
